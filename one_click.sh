@@ -26,8 +26,8 @@ git config --global user.email  "wushuangliu070@foxmain.com"
 echo "git 配置完成"
 
 #配置全局代理
-echo "http://127.0.0.1:20171" >> /etc/profile
-echo "https_proxy=http://127.0.0.1:20171" >> /etc/profile
+echo "export http://127.0.0.1:20171" >> /etc/profile
+echo "export https_proxy=http://127.0.0.1:20171" >> /etc/profile
 source /etc/profile
 export http_proxy
 export https_proxy
