@@ -2,7 +2,7 @@
 
 
 #换源
-read -p "是否换源为ali源,y or n `echo '$\n'`" _source_
+read -p "是否换源为ali源,y or n `echo $'\n'`" _source_
 if [$_source_ == y];	then
 rm /etc/yum.repos.d/*
 wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo
@@ -15,7 +15,7 @@ else
 fi
 
 #安装zsh和oh-my-zsh
-read -p "是否安装zsh和oh-my-zsh,y or n `echo '$\n'`"	_zsh_
+read -p "是否安装zsh和oh-my-zsh,y or n `echo $'\n'`"	_zsh_
 if [$_zsh_ == y];	then
 yum install -y zsh git
 wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh
@@ -33,7 +33,7 @@ echo "ssh配置完成"
 
 #git 配置邮箱用户名
 echo "配置git "
-read -p "输入您的名称和邮箱,用空格隔开 `echo '$\n'`" _name_	_email_
+read -p "输入您的名称和邮箱,用空格隔开 `echo $'\n'`" _name_	_email_
 git config --global user.name  "$_name_"
 git config --global user.email  "$email"
 echo "git 配置完成 "
@@ -59,7 +59,7 @@ yum install vim
 mv ./.vimrc ~/.vimrc
 
 #安装docker
-read -p "是否安装docker,y or n `echo '$\n'`"	_docker_
+read -p "是否安装docker,y or n `echo $'\n'`"	_docker_
 if [$_docker_== y];	then
 yum install -y yum-utils device-mapper-persistent-data lvm2
 yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
@@ -73,13 +73,13 @@ else
 fi
 
 #安装nodejs
-read -p "是否安装nodejs,y or n `echo '$\n'`"	_nodejs_
+read -p "是否安装nodejs,y or n `echo $'\n'`"	_nodejs_
 if [$_nodejs_ == y];	then
 git clone https://github.com/cnpm/nvm.git ~/.nvm && cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`
 echo ". ~/.nvm/nvm.sh" >> /etc/profile
 source /etc/profile
 nvm install v7.4.0
-echo "nodejs安装成功 \n"
+echo "nodejs安装成功 "
 else
-	echo "跳过安装nodejs \n"
+	echo "跳过安装nodejs "
 fi
