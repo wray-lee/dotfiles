@@ -8,7 +8,7 @@ echo $_password_ | sudo sed -e 's|^metalink=|#metalink=|g' \
          /etc/yum.repos.d/fedora-modular.repo \
          /etc/yum.repos.d/fedora-updates.repo \
          /etc/yum.repos.d/fedora-updates-modular.repo
-echo $_password_ | sudo dnf install --assumeyes zsh neofetch docker nginx git ranger fd bat tldr
+echo $_password_ | sudo dnf install --assumeyes zsh neofetch docker nginx git ranger bat tldr
 sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
