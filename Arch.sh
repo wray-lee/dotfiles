@@ -13,3 +13,4 @@ sudo cp ~/.zshrc /root
 wget -c https://raw.githubusercontent.com/wray-lee/one_click/main/.p10k.zsh -O ~/.p10k.zsh
 sudo cp ~/.p10k.zsh /root
 chsh -s /usr/bin/zsh
+chsh -s /usr/bin/zsh root
