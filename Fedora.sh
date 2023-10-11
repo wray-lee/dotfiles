@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 read -p "Password:" _password_
-echo $_password_ |sudo sed -e 's|^metalink=|#metalink=|g' \
+echo $_password_ | sudo sed -e 's|^metalink=|#metalink=|g' \
          -e 's|^#baseurl=http://download.example/pub/fedora/linux|baseurl=https://mirrors.ustc.edu.cn/fedora|g' \
          -i.bak \
          /etc/yum.repos.d/fedora.repo \
