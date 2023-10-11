@@ -1,4 +1,4 @@
-# one_click
+# One_Click
 Arch: `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Arch.sh`
 
 
