@@ -124,6 +124,6 @@ alias gitvpn='git config --global http.proxy 'http://127.0.0.1:7890' ; git confi
 alias ungitvpn='git config --global --unset http.proxy ; git config --global --unset https.proxy'
 alias gitsvpn='git config --global http.proxy 'socks5://127.0.0.1:7895' ; git config --global https.proxy 'socks5://127.0.0.1:7895''
 
-vpn
-gitsvpn
+#vpn
+#gitsvpn
 
