@@ -1,5 +1,5 @@
 # One_Click
-Arch: `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Arch.sh`
+Arch: `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/Arch.sh' && sh -c "$(curl -kfsSL $url)"`
 
 
-Fedora: `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Fedora.sh`
+Fedora: `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/Fedora.sh' && sh -c "$(curl -kfsSL $url)"`
