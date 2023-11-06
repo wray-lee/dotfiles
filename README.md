@@ -4,4 +4,4 @@ Arch: `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/Arc
 
 Fedora: `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/Fedora.sh' && sh -c "$(curl -kfsSL $url)"`
 
-Cert: `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/one_click.sh' && sh -c "$(curl -kfsSL $url)"`
+Cert: `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/gencrt.sh' && sh -c "$(curl -kfsSL $url)"`
