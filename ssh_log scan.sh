@@ -11,7 +11,7 @@ case "$num" in
     2)
         sed -ne '/Accepted/p' -e '/open/p' auth.log;;
     3)
-        sed -ne 's/Received disconnect from [0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}/&/p' auth.log;;
+        sed -ne 's/Received disconnect from [0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}.*\[preauth\]$/&/p' auth.log;;
     *)
         exit 1;;
 esac
