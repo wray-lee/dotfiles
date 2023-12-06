@@ -1,13 +1,17 @@
 #!/bin/bash
 #
 read -p "Password:" _password_
-echo $_password_ | sudo sed -e 's|^metalink=|#metalink=|g' \
+echo "Do you want to change the source?(y/n)"
+read -e _source_
+if [$_source_ -gt y]; then
+    echo $_password_ | sudo sed -e 's|^metalink=|#metalink=|g' \
          -e 's|^#baseurl=http://download.example/pub/fedora/linux|baseurl=https://mirrors.ustc.edu.cn/fedora|g' \
          -i.bak \
          /etc/yum.repos.d/fedora.repo \
          /etc/yum.repos.d/fedora-modular.repo \
          /etc/yum.repos.d/fedora-updates.repo \
          /etc/yum.repos.d/fedora-updates-modular.repo
+fi
 echo $_password_ | sudo dnf install --assumeyes zsh neofetch docker nginx git ranger bat tldr
 sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
