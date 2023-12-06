@@ -2,7 +2,7 @@
 #
 echo "Do you want to change the source?(y/n)"
 read -e _source_
-if [$_source_ -gt y]; then
+if [ $_source_ -gt y ]; then
     sudo sed -i.bak 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list
 fi
 sudo apt update

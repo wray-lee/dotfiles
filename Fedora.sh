@@ -2,7 +2,7 @@
 #
 echo "Do you want to change the source?(y/n)"
 read -e _source_
-if [$_source_ -gt y]; then
+if [ $_source_ -gt y ]; then
     echo $_password_ | sudo sed -e 's|^metalink=|#metalink=|g' \
          -e 's|^#baseurl=http://download.example/pub/fedora/linux|baseurl=https://mirrors.ustc.edu.cn/fedora|g' \
          -i.bak \
