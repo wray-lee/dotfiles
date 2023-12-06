@@ -12,6 +12,7 @@ if [$_source_ -gt y]; then
          /etc/yum.repos.d/fedora-updates.repo \
          /etc/yum.repos.d/fedora-updates-modular.repo
 fi
+echo $_password_ | yum update
 echo $_password_ | sudo dnf install --assumeyes zsh neofetch docker nginx git ranger bat tldr
 sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
