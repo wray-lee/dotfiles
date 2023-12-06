@@ -1,13 +1,12 @@
 #!/bin/bash
 #
-read -ep "Password:" _password_
 echo "Do you want to change the source?(y/n)"
 read -e _source_
 if [$_source_ -gt y]; then
-    echo $_password_ | sudo sed -i.bak 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list
+    sudo sed -i.bak 's@//.*archive.ubuntu.com@//mirrors.ustc.edu.cn@g' /etc/apt/sources.list
 fi
-echo $_password_ | sudo apt update
-echo $_password_ | sudo apt install -y zsh neofetch docker nginx git ranger bat tldr
+sudo apt update
+sudo apt install -y zsh neofetch docker nginx git ranger bat tldr
 sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
