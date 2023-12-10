@@ -20,10 +20,11 @@ git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:
 wget -c https://raw.githubusercontent.com/wray-lee/one_click/main/.vimrc -O ~/.vimrc
 sudo cp ~/.vimrc /root
 sed -i '1i|neofetch' .
-sudo sed -e '1i neofetch' -e 's|ZSH_THEME="robbyrussell"|ZSH_THEME="powerlevel10k/powerlevel10k"|g' -e 's|plugins=(git)|plugins=(git zsh-autosuggestions zsh-syntax-highlighting)|g' -i ~/.zshrc
-sudo cp ~/.zshrc /root
+sudo sed -e 's|ZSH_THEME="robbyrussell"|ZSH_THEME="powerlevel10k/powerlevel10k"|g' -e 's|plugins=(git)|plugins=(git zsh-autosuggestions zsh-syntax-highlighting)|g' -i ~/.zshrc
 wget -c https://raw.githubusercontent.com/wray-lee/one_click/main/.p10k.zsh -O ~/.p10k.zsh
+sudo sed -e '1i neofetch' -i ~/.zshrc
 sudo cp ~/.p10k.zsh /root
+sudo cp ~/.zshrc /root
 sudo cp -r ./.oh-my-zsh /root/.oh-my-zsh
 #chsh -s /usr/bin/zsh
 #chsh -s /usr/bin/zsh root
