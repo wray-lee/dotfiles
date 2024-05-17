@@ -7,4 +7,4 @@ Fedora: `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Fedora.s
 Ubuntu `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Ubuntu.sh && bash Ubuntu.sh`
 
 
-Cert: `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/gencrt.sh' && sh -c "$(curl -kfsSL $url)"`
+Cert: `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/gencrt.sh' && bash <"$(curl -kfsSL $url)"`
