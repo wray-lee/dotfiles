@@ -128,7 +128,11 @@ shotactive() {
 
 shotswappy() {
 	tmpfile=$(mktemp)
-	grim -g "$(slurp)" - >"$tmpfile" && notify_view "swappy"
+	grim -g "$(slurp)" - >"$tmpfile"
+	if [[ -s "$tmpfile" ]]; then
+		wl-copy < "$tmpfile"
+	fi
+	notify_view "swappy"
 }
 
 if [[ ! -d "$dir" ]]; then
