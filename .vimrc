@@ -135,7 +135,7 @@ endif
 
 " theme
 set background=dark
-colorscheme desert
+colorscheme codedark
 
 " set mark column color
 hi! link SignColumn   LineNr
