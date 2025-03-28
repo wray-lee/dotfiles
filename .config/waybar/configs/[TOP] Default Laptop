@@ -17,7 +17,7 @@
 "spacing": 3,
 "fixed-center": true,
 "ipc": true,
-"margin-top": 3,
+"margin-top": 0,
 "margin-left": 8,
 "margin-right": 8,
 
@@ -28,6 +28,7 @@
 	"custom/playerctl",
 	"custom/separator#blank_2",
 	"hyprland/window",
+	"hyprland/workspaces#rw",
 	],
 
 "modules-center": [
@@ -35,7 +36,7 @@
 	"custom/separator#blank",
 	"group/notify",
 	"custom/separator#dot-line",
-	"hyprland/workspaces#rw",
+	//"hyprland/workspaces#rw",
 	"clock",
 	"custom/separator#dot-line",
 	"custom/weather",

@@ -17,14 +17,14 @@
 	/* set font-size to 100% if font scaling is set to 1.00 using nwg-look */
 	font-size: 97%;
 	font-feature-settings: '"zero", "ss01", "ss02", "ss03", "ss04", "ss05", "cv31"';
-	/* color: #91bef0 */
-	color: #003087
+	color: #91bef0
+	/* color: #003087 */
 }
 	
 window#waybar {
 	background:transparent;
 	/* background-color: #ffc1cc; */
-	background-color: rgba(255, 193, 204, 0.3);
+	/* background-color: rgba(255, 193, 204, 0.3); */
 	border-radius: 15px;
 	color: @text;
 }
@@ -35,7 +35,7 @@ window#waybar.hidden {
 window#waybar.empty {
 	background: transparent;
 	/* background-color: #ffc1cc; */
-	background-color: rgba(255, 193, 204, 0.3);
+	/* background-color: rgba(255, 193, 204, 0.3); */
 }
 	
 window#waybar.empty #window {
@@ -46,15 +46,19 @@ window#waybar.empty #window {
 
 /*-----module groups----*/
 .modules-right {
-	
+	/* background-color: rgba(255, 193, 204, 0.3); */
+	background-color: rgba(66, 66, 6, 0.7);
+	border-radius: 15px;
 }
 
 .modules-center {
-		
+	background-color: rgba(66, 66, 66, 0.7);
+	border-radius: 15px;
 }
 
 .modules-left {
-	   
+	background-color: rgba(66, 66, 66, 0.7);
+	border-radius: 15px;
 }
 
 tooltip {
@@ -214,5 +218,4 @@ tooltip {
 	border-radius: 5px;
 	background-color: wheat;
 }
-	
-	
+

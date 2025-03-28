@@ -18,7 +18,7 @@
 },
 
 "custom/file_manager": {
-	"format": " ",
+	"format": " ",
 	"on-click": "xdg-open . &",
 	"tooltip": true,
 	"tooltip-format": "File Manager",
@@ -32,7 +32,7 @@
 },
 
 "custom/browser": {
-	"format": " ",
+	"format": "󰇩 ",
 	"on-click": "xdg-open http:// &",
 	"tooltip": true,
 	"tooltip-format": "Launch Browser",
