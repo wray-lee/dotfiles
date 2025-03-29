@@ -1,7 +1,7 @@
 #!/bin/bash
 ## /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  ##
 # For Dark and Light switching
-# Note: Scripts are looking for keywords Light or Dark except for wallpapers as the are in a separate folders
+# Note: Scripts are looking for keywords Light or Dark except for wallpapers as the are in a separate directories
 
 # Paths
 wallpaper_base_path="$HOME/Pictures/wallpapers/Dynamic-Wallpapers"
@@ -21,7 +21,7 @@ pallete_dark="dark16"
 pallete_light="light16"
 
 # intial kill process
-for pid in kitty waybar rofi swaync ags swaybg; do
+for pid in waybar rofi swaync ags swaybg; do
     killall -SIGUSR1 "$pid"
 done
 
@@ -85,10 +85,10 @@ notify_user "$next_mode"
 # swaync color change
 if [ "$next_mode" = "Dark" ]; then
     sed -i '/@define-color noti-bg/s/rgba([0-9]*,\s*[0-9]*,\s*[0-9]*,\s*[0-9.]*);/rgba(0, 0, 0, 0.8);/' "${swaync_style}"
-	sed -i '/@define-color noti-bg-alt/s/#.*;/#111111;/' "${swaync_style}"
+	#sed -i '/@define-color noti-bg-alt/s/#.*;/#111111;/' "${swaync_style}"
 else
     sed -i '/@define-color noti-bg/s/rgba([0-9]*,\s*[0-9]*,\s*[0-9]*,\s*[0-9.]*);/rgba(255, 255, 255, 0.9);/' "${swaync_style}"
-	sed -i '/@define-color noti-bg-alt/s/#.*;/#F0F0F0;/' "${swaync_style}"
+	#sed -i '/@define-color noti-bg-alt/s/#.*;/#F0F0F0;/' "${swaync_style}"
 fi
 
 # ags color change
@@ -114,6 +114,10 @@ else
 	sed -i '/^background /s/^background .*/background #dddddd/' "${kitty_conf}"
 	sed -i '/^cursor /s/^cursor .*/cursor #000000/' "${kitty_conf}"
 fi
+
+for pid_kitty in $(pidof kitty); do
+    kill -SIGUSR1 "$pid_kitty"
+done
 
 # Set Dynamic Wallpaper for Dark or Light Mode
 if [ "$next_mode" = "Dark" ]; then
@@ -144,9 +148,9 @@ kvantummanager --set "$kvantum_theme"
 
 # set the rofi color for background
 if [ "$next_mode" = "Dark" ]; then
-    sed -i '24s/.*/background: rgba(0,0,0,0.7);/' $wallust_rofi
+    sed -i '/^background:/s/.*/background: rgba(0,0,0,0.7);/' $wallust_rofi
 else
-    sed -i '24s/.*/background: rgba(255,255,255,0.9);/' $wallust_rofi
+    sed -i '/^background:/s/.*/background: rgba(255,255,255,0.9);/' $wallust_rofi
 fi
 
 
@@ -235,7 +239,7 @@ ${SCRIPTSDIR}/WallustSwww.sh &&
 
 sleep 2
 # kill process
-for pid1 in kitty waybar rofi swaync ags swaybg; do
+for pid1 in waybar rofi swaync ags swaybg; do
     killall "$pid1"
 done
 
