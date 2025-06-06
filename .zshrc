@@ -64,7 +64,7 @@ setopt appendhistory
 alias sudo='sudo '
 alias vim='nvim'
 alias nas='sudo mount -o username=wray //nas/storage /mnt/smb'
-alias mpvs='mpv --hwdec=auto --profile=low-latency --untimed'
+alias mpvs='mpv --hwdec=auto --profile=low-latency --untimed '
 alias vpn='sudo systemctl start clash'
 alias ungitvpn='git config --global --unset http.proxy ; git config --global --unset https.proxy'
 alias gitvpn='git config --global http.proxy 'socks5://127.0.0.1:7999' ; git config --global https.proxy 'socks5://127.0.0.1:7999''
