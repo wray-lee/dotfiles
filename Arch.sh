@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-sudo pacman -S --noconfirm zsh neofetch docker nginx git ranger bat tldr lsd duf zoxide fd btop nmap
+sudo pacman -S --noconfirm zsh fastfetch docker nginx git ranger bat tldr lsd duf zoxide fd btop nmap
 sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
 git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
@@ -12,5 +12,8 @@ sudo sudo sed -e '1i neofetch' -e 's|ZSH_THEME="robbyrussell"|ZSH_THEME="powerle
 sudo cp ~/.zshrc /root
 wget -c https://raw.githubusercontent.com/wray-lee/one_click/main/.p10k.zsh -O ~/.p10k.zsh
 sudo cp ~/.p10k.zsh /root
+mkdir -p ~/.config/fastfetch
+wget -c https://raw.githubusercontent.com/wray-lee/dotfiles/refs/heads/main/.config/fastfetch/config.jsonc -O ~/.config/fastfetch
+sudo cp -r ~/.config/fastfetch /root/.config
 #chsh -s /usr/bin/zsh
 #chsh -s /usr/bin/zsh root
