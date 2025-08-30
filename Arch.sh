@@ -13,7 +13,7 @@ sudo cp ~/.zshrc /root
 wget -c https://raw.githubusercontent.com/wray-lee/one_click/main/.p10k.zsh -O ~/.p10k.zsh
 sudo cp ~/.p10k.zsh /root
 mkdir -p ~/.config/fastfetch
-wget -c https://raw.githubusercontent.com/wray-lee/dotfiles/refs/heads/main/.config/fastfetch/config.jsonc -o ~/.config/fastfetch
+wget -c https://raw.githubusercontent.com/wray-lee/dotfiles/refs/heads/main/.config/fastfetch/config.jsonc -P ~/.config/fastfetch
 sudo cp -r ~/.config/fastfetch /root/.config
 #chsh -s /usr/bin/zsh
 #chsh -s /usr/bin/zsh root
