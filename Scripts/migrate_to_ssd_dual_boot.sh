@@ -92,7 +92,7 @@ prepare_disk() {
     
     # 格式化分区
     echo -e "\n[2/8] 格式化分区..."
-    mkfs.xfs -F -L ROOTFS "$TARGET_PART"
+    mkfs.xfs -f -L ROOTFS "$TARGET_PART"
     sync
     
     # 获取新UUID (带重试)
@@ -181,15 +181,15 @@ LABEL ssd
   MENU LABEL Boot from SSD (Primary)
   LINUX /Image
   INITRD /uInitrd
-  FDT /dtb/rockchip/rk3566-wxy-oec-turbo-4g.dtb
-  APPEND root=UUID=$NEW_UUID rootflags=data=writeback rw rootwait rootfstype=ext4 console=ttyS2,1500000 console=tty1 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 bootsplash.bootfile=bootsplash.armbian
+  FDT /dtb/amlogic/meson-g12b-a311d-oes-00050000.dtb
+  APPEND root=UUID=$NEW_UUID rootflags=compress=zstd:6 rootfstype=xfs console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 coherent_pool=2M libata.force=noncq ubootpart= fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
 
 LABEL emmc
   MENU LABEL Boot from eMMC (Fallback)
   LINUX /Image
   INITRD /uInitrd
-  FDT /dtb/rockchip/rk3566-wxy-oec-turbo-4g.dtb
-  APPEND root=UUID=$EMMC_ROOT_UUID rootflags=data=writeback rw rootwait rootfstype=ext4 console=ttyS2,1500000 console=tty1 no_console_suspend consoleblank=0 fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 bootsplash.bootfile=bootsplash.armbian
+  FDT /dtb/amlogic/meson-g12b-a311d-oes-00050000.dtb
+  APPEND root=UUID=$EMMC_ROOT_UUID rootflags=compress=zstd:6 rootfstype=btrfs console=ttyAML0,115200n8 console=tty0 no_console_suspend consoleblank=0 coherent_pool=2M libata.force=noncq ubootpart= fsck.fix=yes fsck.repair=yes net.ifnames=0 max_loop=128 cgroup_enable=cpuset cgroup_memory=1 cgroup_enable=memory swapaccount=1
 EOF
 
     echo "双启动配置完成！"
