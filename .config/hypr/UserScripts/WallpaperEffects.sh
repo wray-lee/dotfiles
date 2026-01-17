@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  #
 # Wallpaper Effects using ImageMagick (SUPER SHIFT W)
 
@@ -108,33 +108,41 @@ main
 sleep 1
 
 if [[ -n "$choice" ]]; then
-  sddm_sequoia="/usr/share/sddm/themes/sequoia_2"
-  if [ -d "$sddm_sequoia" ]; then
-  
-	# Check if yad is running to avoid multiple yad notification
-	if pidof yad > /dev/null; then
-	  killall yad
-	fi
-	
-	if yad --info --text="Set current wallpaper as SDDM background?\n\nNOTE: This only applies to SEQUOIA SDDM Theme" \
-    --text-align=left \
-    --title="SDDM Background" \
-    --timeout=5 \
-    --timeout-indicator=right \
-    --button="yad-yes:0" \
-    --button="yad-no:1" \
-    ; then
+  # Resolve SDDM themes directory (standard and NixOS path)
+  sddm_themes_dir=""
+  if [ -d "/usr/share/sddm/themes" ]; then
+    sddm_themes_dir="/usr/share/sddm/themes"
+  elif [ -d "/run/current-system/sw/share/sddm/themes" ]; then
+    sddm_themes_dir="/run/current-system/sw/share/sddm/themes"
+  fi
 
-    # Check if terminal exists
-    if ! command -v "$terminal" &>/dev/null; then
-    notify-send -i "$iDIR/ja.png" "Missing $terminal" "Install $terminal to enable setting of wallpaper background"
-    exit 1
-    fi
+  if [ -n "$sddm_themes_dir" ]; then
+    sddm_simple="$sddm_themes_dir/simple_sddm_2"
 
-      # Open terminal and set the wallpaper
-    $terminal -e bash -c "echo 'Enter your password to set wallpaper as SDDM Background'; \
-    sudo cp -r $wallpaper_output '$sddm_sequoia/backgrounds/default' && \
-    notify-send -i '$iDIR/ja.png' 'SDDM' 'Background SET'"
+    # Only prompt if theme exists and its Backgrounds directory is writable
+    if [ -d "$sddm_simple" ] && [ -w "$sddm_simple/Backgrounds" ]; then
+      # Check if yad is running to avoid multiple yad notification
+      if pidof yad > /dev/null; then
+        killall yad
+      fi
+
+      if yad --info --text="Set current wallpaper as SDDM background?\n\nNOTE: This only applies to SIMPLE SDDM v2 Theme" \
+        --text-align=left \
+        --title="SDDM Background" \
+        --timeout=5 \
+        --timeout-indicator=right \
+        --button="yad-yes:0" \
+        --button="yad-no:1" \
+        ; then
+
+        # Check if terminal exists
+        if ! command -v "$terminal" &>/dev/null; then
+          notify-send -i "$iDIR/ja.png" "Missing $terminal" "Install $terminal to enable setting of wallpaper background"
+          exit 1
+        fi
+
+        exec "$SCRIPTSDIR/sddm_wallpaper.sh" --effects
+      fi
     fi
   fi
 fi
