@@ -3,7 +3,7 @@
 # Screenshots scripts
 
 # variables
-time=$(date "+%d-%b_%H-%M-%S")
+time=$(date "+%Y-%m-%d_%r")
 dir="$(xdg-user-dir PICTURES)/Screenshots"
 file="Screenshot_${time}_${RANDOM}.png"
 
@@ -82,7 +82,7 @@ countdown() {
 # take shots
 shotnow() {
 	cd ${dir} && grim - | tee "$file" | wl-copy
-	sleep 2
+	# sleep 1
 	notify_view
 }
 
