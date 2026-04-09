@@ -109,7 +109,8 @@ tooltip {
 }
 
 .modules-center {
-    background-color: @background-module;
+    /* background-color: @background-module; */
+    background-color: alpha(@background, 0.8);
     border-radius: 0px 0px 45px 45px;
 	padding-top: 8px;
 	padding-bottom: 8px;
