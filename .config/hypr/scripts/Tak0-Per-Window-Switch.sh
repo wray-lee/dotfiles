@@ -1,3 +1,9 @@
+# ==================================================
+#  KoolDots (2026)
+#  Project URL: https://github.com/LinuxBeginnings
+#  License: GNU GPLv3
+#  SPDX-License-Identifier: GPL-3.0-or-later
+# ==================================================
 ##################################################################
 #                                                                #
 #                                                                #
@@ -10,11 +16,11 @@
 #                 smooth and comfortable workflow.               #
 #                                                                #
 ##################################################################
-
-# This is for changing kb_layouts. Set kb_layouts in
+# This is for changing kb_layouts. Set kb_layouts in 
 
 MAP_FILE="$HOME/.cache/kb_layout_per_window"
-CFG_FILE="$HOME/.config/hypr/configs/SystemSettings.conf"
+USER_CFG="$HOME/.config/hypr/UserConfigs/UserSettings.conf"
+SYS_CFG="$HOME/.config/hypr/configs/SystemSettings.conf"
 ICON="$HOME/.config/swaync/images/ja.png"
 SCRIPT_NAME="$(basename "$0")"
 
@@ -22,13 +28,16 @@ SCRIPT_NAME="$(basename "$0")"
 touch "$MAP_FILE"
 
 # Read layouts from config
-if ! grep -q 'kb_layout' "$CFG_FILE"; then
-  echo "Error: cannot find kb_layout in $CFG_FILE" >&2
+if grep -q 'kb_layout' "$USER_CFG" 2>/dev/null; then
+  CFG_FILE="$USER_CFG"
+elif grep -q 'kb_layout' "$SYS_CFG" 2>/dev/null; then
+  CFG_FILE="$SYS_CFG"
+else
+  echo "Error: cannot find kb_layout in UserSettings.conf nor SystemSettings.conf" >&2
   exit 1
 fi
 kb_layouts=($(grep 'kb_layout' "$CFG_FILE" | cut -d '=' -f2 | tr -d '[:space:]' | tr ',' ' '))
 count=${#kb_layouts[@]}
-
 # Get current active window ID
 get_win() {
   hyprctl activewindow -j | jq -r '.address // .id'
@@ -42,8 +51,8 @@ get_keyboards() {
 # Save window-specific layout
 save_map() {
   local W=$1 L=$2
-  grep -v "^${W}:" "$MAP_FILE" >"$MAP_FILE.tmp"
-  echo "${W}:${L}" >>"$MAP_FILE.tmp"
+  grep -v "^${W}:" "$MAP_FILE" > "$MAP_FILE.tmp"
+  echo "${W}:${L}" >> "$MAP_FILE.tmp"
   mv "$MAP_FILE.tmp" "$MAP_FILE"
 }
 
@@ -75,7 +84,7 @@ cmd_toggle() {
       break
     fi
   done
-  NEXT=$(((i + 1) % count))
+  NEXT=$(( (i+1) % count ))
   do_switch "$NEXT"
   save_map "$W" "${kb_layouts[NEXT]}"
   notify-send -u low -i "$ICON" "kb_layout: ${kb_layouts[NEXT]}"
@@ -114,9 +123,6 @@ fi
 
 # CLI
 case "$1" in
-toggle | "") cmd_toggle ;;
-*)
-  echo "Usage: $SCRIPT_NAME [toggle]" >&2
-  exit 1
-  ;;
+  toggle|"") cmd_toggle ;;
+  *) echo "Usage: $SCRIPT_NAME [toggle]" >&2; exit 1 ;;
 esac

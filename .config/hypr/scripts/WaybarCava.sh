@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
+# ==================================================
+#  KoolDots (2026)
+#  Project URL: https://github.com/LinuxBeginnings
+#  License: GNU GPLv3
+#  SPDX-License-Identifier: GPL-3.0-or-later
+# ==================================================
 # WaybarCava.sh — safer single-instance handling, cleanup, and robustness
-# Original concept by JaKooLit; this variant focuses on lifecycle hardening.
+# Original concept by LinuxBeginnings; this variant focuses on lifecycle hardening.
 
 set -euo pipefail
 
@@ -9,6 +15,9 @@ if ! command -v cava >/dev/null 2>&1; then
   echo "cava not found in PATH" >&2
   exit 1
 fi
+
+# Proactively reap any stale Waybar-spawned cava (unique temp conf names)
+pkill -f 'waybar-cava\..*\.conf' 2>/dev/null || true
 
 # 0..7 → ▁▂▃▄▅▆▇█
 bar="▁▂▃▄▅▆▇█"
@@ -32,7 +41,11 @@ printf '%d' $$ >"$pidfile"
 
 # Unique temp config + cleanup on exit
 config_file="$(mktemp "$RUNTIME_DIR/waybar-cava.XXXXXX.conf")"
-cleanup() { rm -f "$config_file" "$pidfile"; }
+cleanup() {
+  # Kill children (cava, sed) of this script, then remove files
+  pkill -P "$$" 2>/dev/null || true
+  rm -f "$config_file" "$pidfile"
+}
 trap cleanup EXIT INT TERM
 
 cat >"$config_file" <<EOF
@@ -52,4 +65,5 @@ ascii_max_range = 7
 EOF
 
 # Stream cava output and translate digits 0..7 to bar glyphs
-exec cava -p "$config_file" | sed -u "$dict"
+# (no exec: keep this shell as the parent so the trap can reap children)
+cava -p "$config_file" | sed -u "$dict"

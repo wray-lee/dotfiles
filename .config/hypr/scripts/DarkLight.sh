@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
-## /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  ##
+# ==================================================
+#  KoolDots (2026)
+#  Project URL: https://github.com/LinuxBeginnings
+#  License: GNU GPLv3
+#  SPDX-License-Identifier: GPL-3.0-or-later
+# ==================================================
 # For Dark and Light switching
 # Note: Scripts are looking for keywords Light or Dark except for wallpapers as the are in a separate directories
 
 # Paths
-wallpaper_base_path="$HOME/Pictures/wallpapers/Dynamic-Wallpapers"
+PICTURES_DIR="$(xdg-user-dir PICTURES 2>/dev/null || echo "$HOME/Pictures")"
+wallpaper_base_path="$PICTURES_DIR/wallpapers/Dynamic-Wallpapers"
 dark_wallpapers="$wallpaper_base_path/Dark"
 light_wallpapers="$wallpaper_base_path/Light"
 hypr_config_path="$HOME/.config/hypr"
 swaync_style="$HOME/.config/swaync/style.css"
 ags_style="$HOME/.config/ags/user/style.css"
 SCRIPTSDIR="$HOME/.config/hypr/scripts"
+# shellcheck source=/dev/null
+. "$SCRIPTSDIR/WallpaperCmd.sh"
 notif="$HOME/.config/swaync/images/bell.png"
 wallust_rofi="$HOME/.config/wallust/templates/colors-rofi.rasi"
 
@@ -19,6 +27,10 @@ kitty_conf="$HOME/.config/kitty/kitty.conf"
 wallust_config="$HOME/.config/wallust/wallust.toml"
 pallete_dark="dark16"
 pallete_light="light16"
+qt5ct_dark="$HOME/.config/qt5ct/colors/Catppuccin-Mocha.conf"
+qt5ct_light="$HOME/.config/qt5ct/colors/Catppuccin-Latte.conf"
+qt6ct_dark="$HOME/.config/qt6ct/colors/Catppuccin-Mocha.conf"
+qt6ct_light="$HOME/.config/qt6ct/colors/Catppuccin-Latte.conf"
 
 # intial kill process
 for pid in waybar rofi swaync ags swaybg; do
@@ -26,11 +38,11 @@ for pid in waybar rofi swaync ags swaybg; do
 done
 
 
-# Initialize swww if needed
-swww query || swww-daemon --format xrgb
+# Initialize wallpaper daemon if needed
+"$WWW_CMD" query || "$WWW_DAEMON" "${WWW_DAEMON_ARGS[@]}"
 
 # Set swww options
-swww="swww img"
+swww="$WWW_CMD img"
 effect="--transition-bezier .43,1.19,1,.4 --transition-fps 60 --transition-type grow --transition-pos 0.925,0.977 --transition-duration 2"
 
 # Determine current theme mode
@@ -42,6 +54,14 @@ else
     next_mode="Light"
     # Logic for Light mode
     wallpaper_path="$light_wallpapers"
+fi
+# Select Qt color scheme templates for the upcoming mode
+if [ "$next_mode" = "Dark" ]; then
+    qt5ct_color_scheme="$qt5ct_dark"
+    qt6ct_color_scheme="$qt6ct_dark"
+else
+    qt5ct_color_scheme="$qt5ct_light"
+    qt6ct_color_scheme="$qt6ct_light"
 fi
 
 # Function to update theme mode for the next cycle

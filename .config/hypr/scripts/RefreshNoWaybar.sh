@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  ##
+# ==================================================
+#  KoolDots (2026)
+#  Project URL: https://github.com/LinuxBeginnings
+#  License: GNU GPLv3
+#  SPDX-License-Identifier: GPL-3.0-or-later
+# ==================================================
 
 # Modified version of Refresh.sh but waybar wont refresh
 # Used by automatic wallpaper change
@@ -31,9 +36,6 @@ ags -q && ags &
 # quit quickshell & relaunch quickshell
 #pkill qs && qs &
 
-# Wallust refresh (synchronous to ensure colors are ready)
-${SCRIPTSDIR}/WallustSwww.sh
-sleep 0.2
 
 # reload swaync
 swaync-client --reload-config

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  ##
+# ==================================================
+#  KoolDots (2026)
+#  Project URL: https://github.com/LinuxBeginnings
+#  License: GNU GPLv3
+#  SPDX-License-Identifier: GPL-3.0-or-later
+# ==================================================
 # Scripts for refreshing ags, waybar, rofi, swaync, wallust
 
 SCRIPTSDIR=$HOME/.config/hypr/scripts
@@ -14,18 +19,17 @@ file_exists() {
   fi
 }
 
-# Kill already running processes
-_ps=(waybar rofi swaync ags)
+# Kill already running processes (exclude waybar to avoid double reloads)
+_ps=(rofi swaync ags)
 for _prs in "${_ps[@]}"; do
   if pidof "${_prs}" >/dev/null; then
     pkill "${_prs}"
   fi
 done
 
-# added since wallust sometimes not applying
-killall -SIGUSR2 waybar
-# Added sleep for GameMode causing multiple waybar
-sleep 0.1
+# Clean up any Waybar-spawned cava instances (unique temp conf names)
+pkill -f 'waybar-cava\..*\.conf' 2>/dev/null || true
+
 
 # quit ags & relaunch ags
 ags -q && ags &
@@ -33,15 +37,22 @@ ags -q && ags &
 # quit quickshell & relaunch quickshell
 #pkill qs && qs &
 
-# some process to kill
-for pid in $(pidof waybar rofi swaync ags swaybg); do
+# some process to kill (exclude waybar to avoid restart loops)
+for pid in $(pidof rofi swaync ags swaybg); do
   kill -SIGUSR1 "$pid"
   sleep 0.1
 done
 
-#Restart waybar
-sleep 0.1
-waybar &
+# Reload or start waybar once
+if pidof waybar >/dev/null; then
+  if command -v waybar-msg >/dev/null 2>&1; then
+    waybar-msg cmd reload >/dev/null 2>&1 || true
+  else
+    killall -SIGUSR2 waybar 2>/dev/null || true
+  fi
+else
+  waybar &
+fi
 
 # relaunch swaync
 sleep 0.3

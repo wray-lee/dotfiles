@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-# /* ---- 💫 https://github.com/JaKooLit 💫 ---- */  ##
+# ==================================================
+#  KoolDots (2026)
+#  Project URL: https://github.com/LinuxBeginnings
+#  License: GNU GPLv3
+#  SPDX-License-Identifier: GPL-3.0-or-later
+# ==================================================
 # This is for custom version of waybar idle_inhibitor which activates / deactivates hypridle instead
 
 PROCESS="hypridle"
@@ -15,7 +20,8 @@ elif [[ "$1" == "toggle" ]]; then
     if pgrep -x "$PROCESS" >/dev/null; then
         pkill "$PROCESS"
     else
-        "$PROCESS"
+        "$PROCESS" >/dev/null 2>&1 &
+        disown
     fi
 else
     echo "Usage: $0 {status|toggle}"
