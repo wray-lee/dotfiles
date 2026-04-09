@@ -22,14 +22,15 @@ iDIR="$HOME/.config/swaync/images"
 iDIRi="$HOME/.config/swaync/icons"
 
 # swww transition config (only when using swww)
-FPS=60
+FPS=90
 TYPE="any"
-DURATION=2
+DURATION=1
 BEZIER=".43,1.19,1,.4"
 if [[ "$WWW_CMD" == "swww" ]]; then
   SWWW_PARAMS="--transition-fps $FPS --transition-type $TYPE --transition-duration $DURATION --transition-bezier $BEZIER"
 else
-  SWWW_PARAMS=""
+  SWWW_PARAMS="--transition-fps $FPS --transition-type $TYPE --transition-duration $DURATION --transition-bezier $BEZIER"
+  # SWWW_PARAMS=""
 fi
 
 # Check if package bc exists

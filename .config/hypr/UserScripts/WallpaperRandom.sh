@@ -20,14 +20,15 @@ RANDOMPICS=${PICS[ $RANDOM % ${#PICS[@]} ]}
 
 
 # Transition config (only when using swww)
-FPS=30
+FPS=90
 TYPE="random"
 DURATION=1
 BEZIER=".43,1.19,1,.4"
 if [[ "$WWW_CMD" == "swww" ]]; then
   SWWW_PARAMS="--transition-fps $FPS --transition-type $TYPE --transition-duration $DURATION --transition-bezier $BEZIER"
 else
-  SWWW_PARAMS=""
+  SWWW_PARAMS="--transition-fps $FPS --transition-type $TYPE --transition-duration $DURATION --transition-bezier $BEZIER"
+  # SWWW_PARAMS=""
 fi
 if ! "$WWW_CMD" query >/dev/null 2>&1; then
   "$WWW_DAEMON" "${WWW_DAEMON_ARGS[@]}" &
