@@ -15,3 +15,6 @@ fi
 if [ -e "/usr/share/applications/typora.desktop" ]; then
   sed -ie 's/typora %U/typora --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 %U/g' /usr/share/applications/typora.desktop
 fi
+if [ -e "/usr/share/applications/onlyoffice-desktopeditors.desktop" ]; then
+  sed -ie 's/\/usr\/bin\/onlyoffice-desktopeditors %F/\/usr\/bin\/onlyoffice-desktopeditors --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 %F/g' /usr/share/applications/onlyoffice-desktopeditors.desktop
+fi
