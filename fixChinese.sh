@@ -18,3 +18,9 @@ fi
 if [ -e "/usr/share/applications/onlyoffice-desktopeditors.desktop" ]; then
   sed -ie 's/\/usr\/bin\/onlyoffice-desktopeditors %F/\/usr\/bin\/onlyoffice-desktopeditors --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 %F/g' /usr/share/applications/onlyoffice-desktopeditors.desktop
 fi
+if [ -e "/usr/share/applications/microsoft-edge-dev.desktop" ]; then
+  sed -ie 's/\/usr\/bin\/microsoft-edge-dev/\/usr\/bin\/microsoft-edge-dev --ozone-platform=wayland --enable-features=UseOzonePlatform/g' /usr/share/applications/microsoft-edge-dev.desktop
+fi
+if [ -e "/usr/share/applications/thorium-browser.desktop" ]; then
+  sed -ie 's/\/usr\/bin\/thorium-browser/\/usr\/bin\/thorium-browser --ozone-platform=wayland --enable-features=UseOzonePlatform/g' /usr/share/applications/thorium-browser.desktop
+fi
