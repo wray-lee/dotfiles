@@ -24,3 +24,6 @@ fi
 if [ -e "/usr/share/applications/thorium-browser.desktop" ]; then
   sed -ie 's/\/usr\/bin\/thorium-browser/\/usr\/bin\/thorium-browser --ozone-platform=wayland --enable-features=UseOzonePlatform/g' /usr/share/applications/thorium-browser.desktop
 fi
+if [ -e "/usr/share/applications/onlyoffice-desktopeditors.desktop" ]; then
+  sed -ie 's/\/usr\/bin\/onlyoffice-desktopeditors/env QT_QPA_PLATFORM=xcb \/usr\/bin\/onlyoffice-desktopeditors/g' /usr/share/applications/thorium-browser.desktop
+fi
