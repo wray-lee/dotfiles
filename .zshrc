@@ -73,3 +73,4 @@ alias gitvpn='git config --global http.proxy 'socks5://127.0.0.1:7999' ; git con
 alias n2n='edge -c starstudio -k starstudio -l 160.202.250.172:7778 -f -a 223.252.0.2'
 alias typora='typora --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 '
 alias rdesktop='rdesktop -g 2850x1720 '
+alias ssh="kitty +kitten ssh"
