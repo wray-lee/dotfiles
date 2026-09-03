@@ -1,14 +1,19 @@
-# One_Click
-**Arch:** `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Arch.sh && bash Arch.sh`
+# dotfiles
 
-**Fedora:** `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Fedora.sh && bash Fedora.sh`
+Personal dotfiles and bootstrap scripts for various Linux distros.
 
-**Ubuntu:** `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Ubuntu.sh && bash Ubuntu.sh`
+## Quick Bootstrap
 
-**Debian:** `wget https://raw.githubusercontent.com/wray-lee/one_click/main/Debian.sh && bash Debian.sh`
+**Arch:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/Arch.sh && bash Arch.sh`
 
-**Termux:** `wget https://raw.githubusercontent.com/wray-lee/one_click/main/termux.sh && bash termux.sh`
+**Fedora:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/Fedora.sh && bash Fedora.sh`
 
-**Cert:** `export url='https://raw.githubusercontent.com/wray-lee/one_click/main/gencrt.sh' && bash <"$(curl -kfsSL $url)"`
+**Ubuntu:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/Ubuntu.sh && bash Ubuntu.sh`
 
-**vim:** `wget https://raw.githubusercontent.com/wray-lee/one_click/main/setVim.sh && bash setVim.sh ` 
+**Debian:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/Debian.sh && bash Debian.sh`
+
+**Termux:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/termux.sh && bash termux.sh`
+
+**Cert:** `bash <(curl -kfsSL https://raw.githubusercontent.com/wray-lee/dotfiles/main/gencrt.sh)`
+
+**vim:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/setVim.sh && bash setVim.sh`
