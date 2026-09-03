@@ -1,3 +1,10 @@
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
 fastfetch
 export ZSH="$HOME/.oh-my-zsh"
 
@@ -11,12 +18,6 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
 
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -69,7 +70,7 @@ alias df='duf'
 alias mpvs='mpv --hwdec=vaapi --profile=low-latency --untimed --force-seekable=yes '
 alias vpn='sudo systemctl start clash'
 alias ungitvpn='git config --global --unset http.proxy ; git config --global --unset https.proxy'
-alias gitvpn='git config --global http.proxy 'socks5://127.0.0.1:7999' ; git config --global https.proxy 'socks5://127.0.0.1:7999''
+alias gitvpn='git config --global http.proxy '\''socks5://127.0.0.1:7999'\'' ; git config --global https.proxy '\''socks5://127.0.0.1:7999'\'''
 alias n2n='edge -c starstudio -k starstudio -l 160.202.250.172:7778 -f -a 223.252.0.2'
 alias typora='typora --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 '
 alias rdesktop='rdesktop -g 2850x1720 '
