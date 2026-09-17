@@ -1,0 +1,34 @@
+-- ==================================================
+--  KoolDots (2026)
+--  Project URL: https://github.com/LinuxBeginnings
+--  License: GNU GPLv3
+--  SPDX-License-Identifier: GPL-3.0-or-later
+-- ==================================================
+
+-- User animations overrides (auto-generated).
+-- This file is intentionally split from other user overrides.
+-- Add only user-specific Lua overrides here.
+-- Example:
+-- hl.config({ general = { gaps_in = 4, gaps_out = 8 } })
+
+-- Source reference from UserAnimations.conf (hyprlang):
+-- animations {
+-- enabled = yes
+-- bezier = wind, 0.05, 0.9, 0.1, 1.05
+-- bezier = winIn, 0.1, 1.1, 0.1, 1.1
+-- bezier = winOut, 0.3, -0.3, 0, 1
+-- bezier = liner, 1, 1, 1, 1
+-- bezier = overshot, 0.05, 0.9, 0.1, 1.05
+-- bezier = smoothOut, 0.5, 0, 0.99, 0.99
+-- bezier = smoothIn, 0.5, -0.5, 0.68, 1.5
+-- animation = windows, 1, 6, wind, slide
+-- animation = windowsIn, 1, 5, winIn, slide
+-- animation = windowsOut, 1, 3, smoothOut, slide
+-- animation = windowsMove, 1, 5, wind, slide
+-- animation = border, 1, 1, liner
+-- animation = borderangle, 1, 180, liner, loop #used by rainbow borders and rotating colors
+-- animation = fade, 1, 3, smoothOut
+-- animation = workspaces, 1, 5, overshot
+-- animation = workspacesIn, 1, 5, winIn, slide
+-- animation = workspacesOut, 1, 5, winOut, slide
+-- }
