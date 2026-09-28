@@ -86,6 +86,11 @@ set_waybar_style() {
     theme="$1"
     waybar_styles="$HOME/.config/waybar/style"
     waybar_style_link="$HOME/.config/waybar/style.css"
+    # Keep the selected layout/style; Wallust updates its colors for the mode.
+    # Only choose a fallback when no usable stylesheet is selected.
+    if [ -f "$waybar_style_link" ]; then
+        return 0
+    fi
     style_prefix="\\[${theme}\\].*\\.css$"
 
     style_file=$(find -L "$waybar_styles" -maxdepth 1 -type f -regex ".*$style_prefix" | shuf -n 1)
