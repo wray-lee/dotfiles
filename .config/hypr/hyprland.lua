@@ -1,9 +1,17 @@
--- Hyprland Lua Configuration
--- Migrated for Hyprland 0.56+ / 0.57
+-- =============================================================================
+--  Hyprland Lua Configuration
+--  Fully native Lua parity for Hyprland 0.56+ and 0.57+
+-- =============================================================================
+
+local home = os.getenv("HOME")
+local scripts = home .. "/.config/hypr/scripts"
+local userScripts = home .. "/.config/hypr/UserScripts"
+local mainMod = "SUPER"
 
 ------------------
 ---- MONITORS ----
 ------------------
+-- Lenovo Laptop Internal Screen (eDP-1)
 hl.monitor({
     output = "desc:Lenovo Group Limited 0x8A90",
     mode = "2880x1800@60.0",
@@ -11,6 +19,7 @@ hl.monitor({
     scale = 1.5,
 })
 
+-- Hisense External Display
 hl.monitor({
     output = "desc:Hisense Electric Co. Ltd. HISENSE 0x01010101",
     mode = "2560x1440@59.95",
@@ -18,7 +27,7 @@ hl.monitor({
     scale = 1.0,
 })
 
--- Fallback for any other / internal display
+-- Fallback for any other display
 hl.monitor({
     output = "",
     mode = "preferred",
@@ -32,18 +41,18 @@ hl.monitor({
 hl.on("hyprland.start", function()
     hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
     hl.exec_cmd("systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-    hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/scripts/Polkit.sh")
+    hl.exec_cmd(scripts .. "/Dropterminal.sh 'kitty --class kitty-dropterm' &")
+    hl.exec_cmd(scripts .. "/Polkit.sh")
     hl.exec_cmd("nm-applet --indicator")
     hl.exec_cmd("swaync")
     hl.exec_cmd("waybar")
     hl.exec_cmd("hypridle")
-    hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/scripts/Hyprsunset.sh init")
+    hl.exec_cmd(scripts .. "/Hyprsunset.sh init")
     hl.exec_cmd("wl-paste --type text --watch cliphist store")
     hl.exec_cmd("wl-paste --type image --watch cliphist store")
-    hl.exec_cmd(os.getenv("HOME") .. "/.config/hypr/scripts/WallpaperDaemon.sh")
+    hl.exec_cmd(scripts .. "/WallpaperDaemon.sh")
     hl.exec_cmd("blueman-applet")
     hl.exec_cmd("fcitx5 -d")
-    hl.exec_cmd("cc-switch")
 end)
 
 -------------------------------
@@ -84,9 +93,10 @@ hl.config({
         active_opacity = 1.0,
         inactive_opacity = 0.9,
         fullscreen_opacity = 1.0,
-        dim_inactive = true,
-        dim_strength = 0.1,
-        dim_special = 0.8,
+        dim_inactive = false,
+        dim_modal = false,
+        dim_around = 0.0,
+        dim_special = 0.2,
         shadow = {
             enabled = true,
             range = 3,
@@ -99,10 +109,10 @@ hl.config({
             size = 6,
             passes = 3,
             new_optimizations = true,
-            xray = true,
-            ignore_opacity = true,
-            special = true,
-            popups = true,
+            xray = false,
+            ignore_opacity = false,
+            special = false,
+            popups = false,
         },
     },
     dwindle = {
@@ -123,6 +133,7 @@ hl.config({
         mfact = 0.55,
         smart_resizing = true,
         drop_at_cursor = true,
+        always_keep_position = false,
     },
     scrolling = {
         column_width = 0.80,
@@ -202,72 +213,112 @@ hl.animation({ leaf = "workspacesOut", enabled = true, speed = 5, bezier = "winO
 ---------------------
 ---- KEYBINDINGS ----
 ---------------------
-local mainMod = "SUPER"
-local scripts = os.getenv("HOME") .. "/.config/hypr/scripts"
 
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("pkill rofi || true && rofi -show drun -modi drun,filebrowser,run,window"))
-hl.bind("CTRL + ALT + B", hl.dsp.exec_cmd("xdg-open 'https://'"))
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(scripts .. "/OverviewToggle.sh"))
-hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("kitty"))
-hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("thunar"))
-hl.bind(mainMod .. " + H", hl.dsp.exec_cmd(scripts .. "/KeyHints.sh"))
-hl.bind(mainMod .. " + ALT + R", hl.dsp.exec_cmd(scripts .. "/Refresh.sh"))
-hl.bind(mainMod .. " + period", hl.dsp.exec_cmd(scripts .. "/RofiEmoji.sh"))
-hl.bind(mainMod .. " + CTRL + S", hl.dsp.exec_cmd("rofi -show window"))
-hl.bind(mainMod .. " + ALT + O", hl.dsp.exec_cmd(scripts .. "/ChangeBlur.sh"))
-hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd(scripts .. "/GameMode.sh"))
-hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd(scripts .. "/ChangeLayout.sh"))
-hl.bind(mainMod .. " + ALT + V", hl.dsp.exec_cmd(scripts .. "/ClipManager.sh"))
-hl.bind(mainMod .. " + CTRL + R", hl.dsp.exec_cmd(scripts .. "/RofiThemeSelector.sh"))
-hl.bind(mainMod .. " + CTRL + SHIFT + R", hl.dsp.exec_cmd("pkill rofi || true && " .. scripts .. "/RofiThemeSelector-modified.sh"))
+-- Applications & Menus
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("pkill rofi || true && rofi -show drun -modi drun,filebrowser,run,window"), { description = "app launcher" })
+hl.bind("CTRL + ALT + B", hl.dsp.exec_cmd("xdg-open 'https://'"), { description = "open default browser" })
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(scripts .. "/OverviewToggle.sh"), { description = "desktop overview" })
+hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("kitty"), { description = "open terminal" })
+hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("thunar"), { description = "file manager" })
+hl.bind(mainMod .. " + H", hl.dsp.exec_cmd(scripts .. "/KeyHints.sh"), { description = "help cheat sheet" })
+hl.bind(mainMod .. " + ALT + R", hl.dsp.exec_cmd(scripts .. "/Refresh.sh"), { description = "refresh bar and menus" })
+hl.bind(mainMod .. " + period", hl.dsp.exec_cmd(scripts .. "/RofiEmoji.sh"), { description = "emoji menu" })
+hl.bind(mainMod .. " + CTRL + S", hl.dsp.exec_cmd("rofi -show window"), { description = "window switcher" })
+hl.bind(mainMod .. " + ALT + O", hl.dsp.exec_cmd(scripts .. "/ChangeBlur.sh"), { description = "toggle blur" })
+hl.bind(mainMod .. " + SHIFT + G", hl.dsp.exec_cmd(scripts .. "/GameMode.sh"), { description = "toggle game mode" })
+hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd(scripts .. "/ChangeLayout.sh"), { description = "toggle layout" })
+hl.bind(mainMod .. " + ALT + V", hl.dsp.exec_cmd(scripts .. "/ClipManager.sh"), { description = "clipboard manager" })
+hl.bind(mainMod .. " + CTRL + R", hl.dsp.exec_cmd(scripts .. "/RofiThemeSelector.sh"), { description = "rofi theme selector" })
+hl.bind(mainMod .. " + CTRL + SHIFT + R", hl.dsp.exec_cmd("pkill rofi || true && " .. scripts .. "/RofiThemeSelector-modified.sh"), { description = "rofi theme selector modified" })
+hl.bind(mainMod .. " + ALT + C", hl.dsp.exec_cmd(userScripts .. "/RofiCalc.sh"), { description = "calculator" })
+hl.bind(mainMod .. " + SHIFT + M", hl.dsp.exec_cmd(userScripts .. "/RofiBeats.sh"), { description = "online music" })
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd(userScripts .. "/WallpaperSelect.sh"), { description = "select wallpaper" })
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd(userScripts .. "/WallpaperEffects.sh"), { description = "wallpaper effects" })
+hl.bind("CTRL + ALT + W", hl.dsp.exec_cmd(userScripts .. "/WallpaperRandom.sh"), { description = "random wallpaper" })
+hl.bind(mainMod .. " + SHIFT + K", hl.dsp.exec_cmd(scripts .. "/KeyBinds.sh"), { description = "search keybinds" })
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd(scripts .. "/Animations.sh"), { description = "animations menu" })
+hl.bind(mainMod .. " + SHIFT + O", hl.dsp.exec_cmd(userScripts .. "/ZshChangeTheme.sh"), { description = "change zsh theme" })
 
-hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }))
-hl.bind(mainMod .. " + CTRL + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
-hl.bind("ALT + SPACE", hl.dsp.window.float({ action = "toggle" }))
-hl.bind(mainMod .. " + ALT + SPACE", hl.dsp.exec_cmd("hyprctl dispatch workspaceopt allfloat"))
+-- Waybar & Status
+hl.bind(mainMod .. " + CTRL + ALT + B", hl.dsp.exec_cmd("pkill -SIGUSR1 waybar"), { description = "toggle waybar" })
+hl.bind(mainMod .. " + CTRL + B", hl.dsp.exec_cmd(scripts .. "/WaybarStyles.sh"), { description = "waybar styles menu" })
+hl.bind(mainMod .. " + ALT + B", hl.dsp.exec_cmd(scripts .. "/WaybarLayout.sh"), { description = "waybar layout menu" })
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(scripts .. "/Hyprsunset.sh toggle"), { description = "toggle night light" })
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("swaync-client -t -sw"), { description = "notification panel" })
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(scripts .. "/Kool_Quick_Settings.sh"), { description = "quick settings menu" })
 
-hl.bind("CTRL + ALT + Delete", hl.dsp.exec_cmd("hyprctl dispatch exit 0"))
-hl.bind(mainMod .. " + D", hl.dsp.window.close())
-hl.bind(mainMod .. " + ESCAPE", hl.dsp.window.close())
-hl.bind("ALT + F4", hl.dsp.exec_cmd(scripts .. "/KillActiveProcess.sh"))
-hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(scripts .. "/LockScreen.sh"))
-hl.bind("CTRL + ALT + P", hl.dsp.exec_cmd(scripts .. "/Wlogout.sh"))
-hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("swaync-client -t -sw"))
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(scripts .. "/Kool_Quick_Settings.sh"))
+-- Dropdown Terminal & Scratchpad
+hl.bind(mainMod .. " + SHIFT + Return", hl.dsp.exec_cmd(scripts .. "/Dropterminal.sh 'kitty --class kitty-dropterm'"), { description = "dropdown terminal" })
+hl.bind(mainMod .. " + U", hl.dsp.workspace.toggle_special(), { description = "toggle special workspace" })
+hl.bind(mainMod .. " + SHIFT + U", hl.dsp.window.move({ workspace = "special" }), { description = "move to special workspace" })
 
-hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd(scripts .. "/ScreenShot.sh --now"))
-hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(scripts .. "/ScreenShot.sh --area"))
+-- Window State & Control
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "fullscreen" }), { description = "fullscreen" })
+hl.bind(mainMod .. " + CTRL + F", hl.dsp.window.fullscreen({ mode = "maximized" }), { description = "maximize window" })
+hl.bind("ALT + SPACE", hl.dsp.window.float({ action = "toggle" }), { description = "float window" })
+hl.bind(mainMod .. " + ALT + SPACE", hl.dsp.exec_cmd("hyprctl dispatch workspaceopt allfloat"), { description = "float all windows" })
+hl.bind(mainMod .. " + D", hl.dsp.window.close(), { description = "close window" })
+hl.bind(mainMod .. " + ESCAPE", hl.dsp.window.close(), { description = "close window" })
+hl.bind("ALT + F4", hl.dsp.exec_cmd(scripts .. "/KillActiveProcess.sh"), { description = "terminate process" })
+hl.bind(mainMod .. " + L", hl.dsp.exec_cmd(scripts .. "/LockScreen.sh"), { description = "lock screen" })
+hl.bind("CTRL + ALT + Delete", hl.dsp.exit(), { description = "exit Hyprland" })
+hl.bind("CTRL + ALT + P", hl.dsp.exec_cmd(scripts .. "/Wlogout.sh"), { description = "power menu" })
+hl.bind(mainMod .. " + CTRL + O", hl.dsp.window.set_prop({ prop = "opaque", value = "toggle" }), { description = "toggle active window opacity" })
+hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("hyprctl getoption decoration:inactive_opacity | grep -q 'float: 0.9' && hyprctl --batch 'keyword decoration:active_opacity 1.2; keyword decoration:inactive_opacity 1.2' || hyprctl --batch 'keyword decoration:active_opacity 1.0; keyword decoration:inactive_opacity 0.9'"), { description = "toggle opacity preset" })
 
-hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(scripts .. "/Volume.sh --inc"), { locked = true, repeating = true })
-hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(scripts .. "/Volume.sh --dec"), { locked = true, repeating = true })
-hl.bind("XF86AudioMute", hl.dsp.exec_cmd(scripts .. "/Volume.sh --toggle"), { locked = true })
-hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(scripts .. "/Volume.sh --toggle-mic"), { locked = true })
-hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
-hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
-hl.bind("XF86AudioPlay", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --pause"), { locked = true })
-hl.bind("XF86AudioPause", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --pause"), { locked = true })
-hl.bind("XF86AudioNext", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --nxt"), { locked = true })
-hl.bind("XF86AudioPrev", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --prv"), { locked = true })
+-- Layout & Group Controls
+hl.bind(mainMod .. " + P", hl.dsp.window.pseudo(), { description = "toggle pseudo" })
+hl.bind(mainMod .. " + SHIFT + I", hl.dsp.layout("togglesplit"), { description = "toggle split direction" })
+hl.bind(mainMod .. " + I", hl.dsp.layout("addmaster"), { description = "add master" })
+hl.bind(mainMod .. " + CTRL + D", hl.dsp.layout("removemaster"), { description = "remove master" })
+hl.bind(mainMod .. " + CTRL + Return", hl.dsp.layout("swapwithmaster"), { description = "swap with master" })
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd("hyprctl dispatch splitratio 0.3"), { description = "set split ratio" })
 
-hl.bind(mainMod .. " + left", hl.dsp.window.move({ direction = "left" }))
-hl.bind(mainMod .. " + right", hl.dsp.window.move({ direction = "right" }))
-hl.bind(mainMod .. " + up", hl.dsp.window.move({ direction = "up" }))
-hl.bind(mainMod .. " + down", hl.dsp.window.move({ direction = "down" }))
+-- Window Groups
+hl.bind(mainMod .. " + G", hl.dsp.group.toggle(), { description = "toggle window group" })
+hl.bind(mainMod .. " + Tab", hl.dsp.group.next(), { description = "group forward" })
+hl.bind(mainMod .. " + SHIFT + Tab", hl.dsp.group.prev(), { description = "group back" })
+hl.bind(mainMod .. " + CTRL + tab", hl.dsp.group.next(), { description = "change active in group" })
+hl.bind(mainMod .. " + CTRL + K", hl.dsp.window.move({ into_group = "left" }), { description = "move left into group" })
+hl.bind(mainMod .. " + CTRL + L", hl.dsp.window.move({ into_group = "right" }), { description = "move right into group" })
+hl.bind(mainMod .. " + CTRL + H", hl.dsp.window.move({ out_of_group = true }), { description = "move out of group" })
 
-hl.bind("CTRL + ALT + left", hl.dsp.focus({ direction = "left" }))
-hl.bind("CTRL + ALT + right", hl.dsp.focus({ direction = "right" }))
-hl.bind("CTRL + ALT + up", hl.dsp.focus({ direction = "up" }))
-hl.bind("CTRL + ALT + down", hl.dsp.focus({ direction = "down" }))
+-- Window Focus & Movement
+hl.bind(mainMod .. " + left", hl.dsp.window.move({ direction = "left" }), { description = "move window left" })
+hl.bind(mainMod .. " + right", hl.dsp.window.move({ direction = "right" }), { description = "move window right" })
+hl.bind(mainMod .. " + up", hl.dsp.window.move({ direction = "up" }), { description = "move window up" })
+hl.bind(mainMod .. " + down", hl.dsp.window.move({ direction = "down" }), { description = "move window down" })
 
-hl.bind(mainMod .. " + ALT + left", hl.dsp.exec_cmd("hyprctl dispatch resizeactive -50 0"), { repeating = true })
-hl.bind(mainMod .. " + ALT + right", hl.dsp.exec_cmd("hyprctl dispatch resizeactive 50 0"), { repeating = true })
-hl.bind(mainMod .. " + ALT + up", hl.dsp.exec_cmd("hyprctl dispatch resizeactive 0 -50"), { repeating = true })
-hl.bind(mainMod .. " + ALT + down", hl.dsp.exec_cmd("hyprctl dispatch resizeactive 0 50"), { repeating = true })
+hl.bind("CTRL + ALT + left", hl.dsp.focus({ direction = "left" }), { description = "focus left" })
+hl.bind("CTRL + ALT + right", hl.dsp.focus({ direction = "right" }), { description = "focus right" })
+hl.bind("CTRL + ALT + up", hl.dsp.focus({ direction = "up" }), { description = "focus up" })
+hl.bind("CTRL + ALT + down", hl.dsp.focus({ direction = "down" }), { description = "focus down" })
 
-hl.bind(mainMod .. " + SHIFT + left", hl.dsp.exec_cmd("hyprctl dispatch movecurrentworkspacetomonitor l"))
-hl.bind(mainMod .. " + SHIFT + right", hl.dsp.exec_cmd("hyprctl dispatch movecurrentworkspacetomonitor r"))
-hl.bind(mainMod .. " + SHIFT + up", hl.dsp.exec_cmd("hyprctl dispatch movecurrentworkspacetomonitor u"))
-hl.bind(mainMod .. " + SHIFT + down", hl.dsp.exec_cmd("hyprctl dispatch movecurrentworkspacetomonitor d"))
+hl.bind("ALT + tab", hl.dsp.window.cycle_next(), { description = "cycle next window" })
+
+-- Window Resize (Hyprland native window.resize Dispatcher with repeating = true)
+hl.bind(mainMod .. " + ALT + left",  hl.dsp.window.resize({ x = -50, y = 0, relative = true }), { repeating = true, description = "resize left" })
+hl.bind(mainMod .. " + ALT + right", hl.dsp.window.resize({ x = 50, y = 0, relative = true }),  { repeating = true, description = "resize right" })
+hl.bind(mainMod .. " + ALT + up",    hl.dsp.window.resize({ x = 0, y = -50, relative = true }), { repeating = true, description = "resize up" })
+hl.bind(mainMod .. " + ALT + down",  hl.dsp.window.resize({ x = 0, y = 50, relative = true }),  { repeating = true, description = "resize down" })
+
+-- Mouse Window Drag/Resize
+hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
+hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+
+-- Workspaces
+hl.bind(mainMod .. " + tab", hl.dsp.focus({ workspace = "m+1" }), { description = "next workspace" })
+hl.bind(mainMod .. " + SHIFT + tab", hl.dsp.focus({ workspace = "m-1" }), { description = "previous workspace" })
+hl.bind(mainMod .. " + mouse_down", hl.dsp.focus({ workspace = "e+1" }), { description = "scroll next workspace" })
+hl.bind(mainMod .. " + mouse_up", hl.dsp.focus({ workspace = "e-1" }), { description = "scroll prev workspace" })
+hl.bind(mainMod .. " + CTRL + bracketleft", hl.dsp.window.move({ workspace = "-1" }), { description = "move window to prev workspace" })
+hl.bind(mainMod .. " + CTRL + bracketright", hl.dsp.window.move({ workspace = "+1" }), { description = "move window to next workspace" })
+
+-- Move Workspaces between Monitors (Native workspace.move Dispatcher)
+hl.bind(mainMod .. " + SHIFT + left",  hl.dsp.workspace.move({ monitor = "l" }), { description = "workspace to left monitor" })
+hl.bind(mainMod .. " + SHIFT + right", hl.dsp.workspace.move({ monitor = "r" }), { description = "workspace to right monitor" })
+hl.bind(mainMod .. " + SHIFT + up",    hl.dsp.workspace.move({ monitor = "u" }), { description = "workspace to up monitor" })
+hl.bind(mainMod .. " + SHIFT + down",  hl.dsp.workspace.move({ monitor = "d" }), { description = "workspace to down monitor" })
 
 for i = 1, 10 do
     local key = tostring(i % 10)
@@ -275,36 +326,66 @@ for i = 1, 10 do
     hl.bind(mainMod .. " + CTRL + " .. key, hl.dsp.window.move({ workspace = i }))
 end
 
-hl.bind(mainMod .. " + mouse:272", hl.dsp.window.drag(), { mouse = true })
-hl.bind(mainMod .. " + mouse:273", hl.dsp.window.resize(), { mouse = true })
+-- Screenshots
+hl.bind(mainMod .. " + Print", hl.dsp.exec_cmd(scripts .. "/ScreenShot.sh --now"), { description = "screenshot now" })
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(scripts .. "/ScreenShot.sh --area"), { description = "screenshot area" })
 
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd("hyprctl getoption decoration:inactive_opacity | grep -q 'float: 0.9' && hyprctl --batch 'keyword decoration:active_opacity 1.2; keyword decoration:inactive_opacity 1.2' || hyprctl --batch 'keyword decoration:active_opacity 1.0; keyword decoration:inactive_opacity 0.9'"))
+-- Media & Hardware Keys
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd(scripts .. "/Volume.sh --inc"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd(scripts .. "/Volume.sh --dec"), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd(scripts .. "/Volume.sh --toggle"), { locked = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd(scripts .. "/Volume.sh --toggle-mic"), { locked = true })
+hl.bind("XF86Sleep", hl.dsp.exec_cmd("systemctl suspend"), { locked = true })
+hl.bind("XF86Rfkill", hl.dsp.exec_cmd(scripts .. "/AirplaneMode.sh"), { locked = true })
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --pause"), { locked = true })
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --pause"), { locked = true })
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --nxt"), { locked = true })
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --prv"), { locked = true })
+hl.bind("XF86AudioStop", hl.dsp.exec_cmd(scripts .. "/MediaCtrl.sh --stop"), { locked = true })
+
+-- Laptop Display & Keyboard Backlight
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd(scripts .. "/Brightness.sh --inc"), { locked = true, repeating = true })
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd(scripts .. "/Brightness.sh --dec"), { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessUp", hl.dsp.exec_cmd(scripts .. "/BrightnessKbd.sh --inc"), { locked = true, repeating = true })
+hl.bind("XF86KbdBrightnessDown", hl.dsp.exec_cmd(scripts .. "/BrightnessKbd.sh --dec"), { locked = true, repeating = true })
+hl.bind("XF86TouchpadToggle", hl.dsp.exec_cmd(scripts .. "/TouchPad.sh"))
+hl.bind("XF86Launch1", hl.dsp.exec_cmd("rog-control-center"))
 
 ----------------------
 ---- WINDOW RULES ----
 ----------------------
-hl.window_rule({
-    name = "suppress-maximize-events",
-    match = { class = ".*" },
-    suppress_event = "maximize",
-})
 
-hl.window_rule({
-    name = "fix-xwayland-drags",
-    match = { class = "^$", title = "^$", xwayland = true, float = true },
-    no_focus = true,
-})
+-- Common Window Tags
+hl.window_rule({ name = "tag-browser", match = { class = "^([Ff]irefox|org[.]mozilla[.]firefox|[Ff]irefox-esr|[Ff]irefox-bin|[Gg]oogle-chrome.*|[Cc]hromium|[Mm]icrosoft-edge.*|[Bb]rave-browser.*|[Tt]horium-browser|[Cc]achy-browser|zen.*)$" }, tag = "+browser" })
+hl.window_rule({ name = "tag-terminal", match = { class = "^(ghostty|wezterm|Alacritty|kitty|kitty-dropterm)$" }, tag = "+terminal" })
+hl.window_rule({ name = "tag-projects", match = { class = "^(codium.*|VSCodium|VSCode|code.*|jetbrains-.*|dev[.]zed[.]Zed|antigravity)$" }, tag = "+projects" })
+hl.window_rule({ name = "tag-im", match = { class = "^([Dd]iscord|[Ww]ebCord|[Vv]esktop|[Ff]erdium|[Ww]hatsapp.*|ZapZap|org[.]telegram[.]desktop|teams-for-linux|Element)$" }, tag = "+im" })
+hl.window_rule({ name = "tag-multimedia", match = { class = "^([Aa]udacious|[Mm]pv|vlc|com[.]github[.]rafostar[.]Clapper)$" }, tag = "+multimedia" })
+hl.window_rule({ name = "tag-file-manager", match = { class = "^([Tt]hunar|org[.]gnome[.]Nautilus|[Pp]cmanfm-qt|app[.]drey[.]Warp)$" }, tag = "+file-manager" })
+hl.window_rule({ name = "tag-settings", match = { class = "^(pavucontrol|.*pwvucontrol|nm-applet|nm-connection-editor|blueman-manager|qt5ct|qt6ct|[Rr]ofi)$" }, tag = "+settings" })
 
-hl.window_rule({
-    name = "pip",
-    match = { title = "^[Pp]icture-in-[Pp]icture$" },
-    float = true,
-    pin = true,
-})
+-- Opacity Rules
+hl.window_rule({ name = "opacity-browser", match = { tag = "browser" }, opacity = "0.99 0.8" })
+hl.window_rule({ name = "opacity-projects", match = { tag = "projects" }, opacity = "0.98 0.85" })
+hl.window_rule({ name = "opacity-im", match = { tag = "im" }, opacity = "0.95 0.8" })
+hl.window_rule({ name = "opacity-multimedia", match = { tag = "multimedia" }, opacity = "0.94 0.86" })
+hl.window_rule({ name = "opacity-file-manager", match = { tag = "file-manager" }, opacity = "0.9 0.8" })
+hl.window_rule({ name = "opacity-terminal", match = { tag = "terminal" }, opacity = "0.9 0.7" })
 
-hl.window_rule({
-    name = "auth-dialogs",
-    match = { title = "^(Authentication Required|Authentication required)$" },
-    float = true,
-    center = true,
-})
+-- Floating & Positioning Dialogs
+hl.window_rule({ name = "suppress-maximize-events", match = { class = ".*" }, suppress_event = "maximize" })
+hl.window_rule({ name = "fix-xwayland-drags", match = { class = "^$", title = "^$", xwayland = true, float = true }, no_focus = true })
+hl.window_rule({ name = "pip", match = { title = "^[Pp]icture-in-[Pp]icture$" }, float = true, pin = true, keep_aspect_ratio = true })
+hl.window_rule({ name = "auth-dialogs", match = { title = "^(Authentication Required|Authentication required)$" }, float = true, center = true })
+hl.window_rule({ name = "dialog-file-open", match = { title = "^(Open Files|Save As|Add Folder to Workspace)$" }, float = true, center = true })
+hl.window_rule({ name = "media-floating", match = { class = "^(mpv|com[.]github[.]rafostar[.]Clapper|[Qq]alculate-gtk)$" }, float = true })
+hl.window_rule({ name = "pavucontrol-center", match = { class = "^(pavucontrol|org[.]pulseaudio[.]pavucontrol|com[.]saivert[.]pwvucontrol)$" }, center = true, float = true })
+hl.window_rule({ name = "fullscreen-idle-inhibit", match = { fullscreen = true }, idle_inhibit = "fullscreen" })
+
+---------------------
+---- LAYER RULES ----
+---------------------
+hl.layer_rule({ name = "rofi-blur", match = { namespace = "rofi" }, blur = true, ignore_alpha = 0 })
+hl.layer_rule({ name = "swaync-blur", match = { namespace = "swaync-control-center" }, blur = true, ignore_alpha = 0 })
+hl.layer_rule({ name = "swaync-notif-blur", match = { namespace = "swaync-notification-window" }, blur = true, ignore_alpha = 0 })
+hl.layer_rule({ name = "waybar-blur", match = { namespace = "waybar" }, blur = true, ignore_alpha = 0 })
