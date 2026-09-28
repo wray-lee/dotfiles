@@ -110,7 +110,7 @@ hl.config({
             passes = 3,
             new_optimizations = true,
             xray = false,
-            ignore_opacity = false,
+            ignore_opacity = true,
             special = false,
             popups = false,
         },
