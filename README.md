@@ -4,16 +4,15 @@ Personal dotfiles and bootstrap scripts for various Linux distros.
 
 ## Quick Bootstrap
 
-**Arch:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/Arch.sh && bash Arch.sh`
+**Setup:** `sh -c "$(curl -fsSL https://raw.githubusercontent.com/wray-lee/dotfiles/main/setup.sh)"`
 
-**Fedora:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/Fedora.sh && bash Fedora.sh`
+(or `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/setup.sh && sh setup.sh`)
 
-**Ubuntu:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/Ubuntu.sh && bash Ubuntu.sh`
+Supported: Arch / Debian / Ubuntu / Fedora / Alpine / Termux.
 
-**Debian:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/Debian.sh && bash Debian.sh`
+**Arch install (from the Arch ISO):** `curl -fsSLO https://raw.githubusercontent.com/wray-lee/dotfiles/main/arch-install.sh && bash arch-install.sh`
+Add a disk to the LVM root: `bash arch-install.sh extend /dev/sdX`
 
-**Termux:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/termux.sh && bash termux.sh`
+**Cert:** `bash <(curl -fsSL https://raw.githubusercontent.com/wray-lee/dotfiles/main/gencrt.sh)`
 
-**Cert:** `bash <(curl -kfsSL https://raw.githubusercontent.com/wray-lee/dotfiles/main/gencrt.sh)`
-
-**vim:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/setVim.sh && bash setVim.sh`
+**vim:** `wget https://raw.githubusercontent.com/wray-lee/dotfiles/main/setVim.sh && sh setVim.sh`

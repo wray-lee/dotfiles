@@ -37,12 +37,20 @@ detect_devices() {
             echo "$((i+1))). /dev/${SSD_CANDIDATES[$i]}"
         done
         read -p "请选择要迁移的目标SSD编号: " choice
+        if ! [[ $choice =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#SSD_CANDIDATES[@]} )); then
+            echo "错误：无效编号"
+            exit 1
+        fi
         TARGET_DISK="/dev/${SSD_CANDIDATES[$((choice-1))]}"
     else
         TARGET_DISK="/dev/${SSD_CANDIDATES[0]}"
     fi
-    
-    TARGET_PART="${TARGET_DISK}1"
+
+    if [[ $TARGET_DISK =~ [0-9]$ ]]; then
+        TARGET_PART="${TARGET_DISK}p1"
+    else
+        TARGET_PART="${TARGET_DISK}1"
+    fi
     MOUNT_DIR="/mnt/ssd_migrate"
 }
 

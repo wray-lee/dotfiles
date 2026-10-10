@@ -1,5 +1,5 @@
-#!/bin/bash
-
-
-wget https://github.com/tomasiser/vim-code-dark/raw/refs/heads/master/colors/codedark.vim -P /usr/share/vim/vim*/colors
-wget https://github.com/wray-lee/one_click/raw/refs/heads/main/.vimrc -O ~/.vimrc
+#!/bin/sh
+set -eu
+mkdir -p ~/.vim/colors
+curl -fsSL https://raw.githubusercontent.com/tomasiser/vim-code-dark/master/colors/codedark.vim -o ~/.vim/colors/codedark.vim
+curl -fsSL https://raw.githubusercontent.com/wray-lee/dotfiles/main/.vimrc -o ~/.vimrc

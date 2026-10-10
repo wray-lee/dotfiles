@@ -1,35 +1,27 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
 
 # create self-signed server certificate:
 
-read -ep "Enter your domain [www.example.com]: " DOMAIN
+read -rp "Enter your domain [www.example.com]: " DOMAIN
+DOMAIN=${DOMAIN:-www.example.com}
 
-echo "Create server key..."
+echo "Create server certificate..."
 
-openssl genrsa -des3 -out $DOMAIN.key 1024
+openssl req -x509 -newkey rsa:2048 -sha256 -days 3650 -nodes \
+    -keyout "$DOMAIN.key" -out "$DOMAIN.crt" \
+    -subj "/C=US/ST=Mars/L=iTranswarp/O=iTranswarp/OU=iTranswarp/CN=$DOMAIN" \
+    -addext "subjectAltName=DNS:$DOMAIN"
 
-echo "Create server certificate signing request..."
-
-SUBJECT="/C=US/ST=Mars/L=iTranswarp/O=iTranswarp/OU=iTranswarp/CN=$DOMAIN"
-
-openssl req -new -subj $SUBJECT -key $DOMAIN.key -out $DOMAIN.csr
-
-echo "Remove password..."
-
-mv $DOMAIN.key $DOMAIN.origin.key
-openssl rsa -in $DOMAIN.origin.key -out $DOMAIN.key
-
-echo "Sign SSL certificate..."
-
-openssl x509 -req -days 3650 -in $DOMAIN.csr -signkey $DOMAIN.key -out $DOMAIN.crt
-
-echo "TODO:"
-echo "Copy $DOMAIN.crt to /etc/nginx/ssl/$DOMAIN.crt"
-echo "Copy $DOMAIN.key to /etc/nginx/ssl/$DOMAIN.key"
-echo "Add configuration in nginx:"
-echo "server {"
-echo "    ..."
-echo "    listen 443 ssl;"
-echo "    ssl_certificate     /etc/nginx/ssl/$DOMAIN.crt;"
-echo "    ssl_certificate_key /etc/nginx/ssl/$DOMAIN.key;"
-echo "}"
+cat <<EOF
+TODO:
+Copy $DOMAIN.crt to /etc/nginx/ssl/$DOMAIN.crt
+Copy $DOMAIN.key to /etc/nginx/ssl/$DOMAIN.key
+Add configuration in nginx:
+server {
+    ...
+    listen 443 ssl;
+    ssl_certificate     /etc/nginx/ssl/$DOMAIN.crt;
+    ssl_certificate_key /etc/nginx/ssl/$DOMAIN.key;
+}
+EOF

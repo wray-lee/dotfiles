@@ -1,3 +1,5 @@
+(( $+commands[fastfetch] )) && fastfetch
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -5,7 +7,6 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-fastfetch
 export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
@@ -36,7 +37,7 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 # fastfetch. Will be disabled if above colorscript was chosen to install
 #fastfetch -c $HOME/.config/fastfetch/config-compact.jsonc
 
-eval "$(zoxide init zsh)"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
 initconda(){
     export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
     if [ -f "/opt/anaconda/etc/profile.d/conda.sh" ]; then
@@ -50,12 +51,12 @@ alias openconda='initconda && conda activate base'
 #alias ls='eza -a --icons'
 #alias ll='eza -al --icons'
 #alias lt='eza -a --tree --level=1 --icons'
-alias ls='lsd'
+(( $+commands[lsd] )) && alias ls='lsd'
 alias ll='ls -lht'
-alias cd='z'
+(( $+commands[zoxide] )) && alias cd='z'
 
 # Set-up FZF key bindings (CTRL R for fuzzy history finder)
-source <(fzf --zsh)
+(( $+commands[fzf] )) && source <(fzf --zsh)
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -64,9 +65,9 @@ setopt appendhistory
 
 
 alias sudo='sudo '
-alias vim='nvim'
+(( $+commands[nvim] )) && alias vim='nvim'
 alias nas='sudo mount -o username=wray //nas/storage /mnt/smb'
-alias df='duf'
+(( $+commands[duf] )) && alias df='duf'
 alias mpvs='mpv --hwdec=vaapi --profile=low-latency --untimed --force-seekable=yes '
 alias vpn='sudo systemctl start clash'
 alias ungitvpn='git config --global --unset http.proxy ; git config --global --unset https.proxy'
