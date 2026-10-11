@@ -76,3 +76,4 @@ alias n2n='edge -c starstudio -k starstudio -l 160.202.250.172:7778 -f -a 223.25
 alias typora='typora --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 '
 alias rdesktop='rdesktop -g 2850x1720 '
 alias ssh="kitty +kitten ssh"
+alias cc-switch="cc-switch-cli "
