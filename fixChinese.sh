@@ -20,6 +20,7 @@ ime="/%[UuFf]/ s/ (%[UuFf])/ $IME \1/; /%[UuFf]/! s/\$/ $IME/"
 for f in code bilibili lx-music-desktop linuxqq typora; do fix "$f.desktop" "$ime"; done
 fix microsoft-edge-dev.desktop "s|^Exec=([^ ]+)|Exec=\1 $OZONE|"
 fix thorium-browser.desktop "s|^Exec=([^ ]+)|Exec=\1 $OZONE|"
+fix io.github.tdesktop_x64.TDesktop.desktop "s|^Exec=([^ ]+)|Exec=\1 $OZONE|"
 fix onlyoffice-desktopeditors.desktop "$ime; s|^Exec=([^ ]+)|Exec=env QT_QPA_PLATFORM=xcb \1 --custom-title-bar|"
 
 update-desktop-database "$dst" 2>/dev/null || true
