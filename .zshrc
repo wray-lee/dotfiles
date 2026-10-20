@@ -1,12 +1,4 @@
-(( $+commands[fastfetch] )) && fastfetch
-
-# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
-# Initialization code that may require console input (password prompts, [y/n]
-# confirmations, etc.) must go above this block; everything else may go below.
-if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
+fastfetch
 export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="powerlevel10k/powerlevel10k"
@@ -19,6 +11,12 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
 # If you come from bash you might have to change your $PATH.
 export PATH=$HOME/bin:/usr/local/bin:$PATH
@@ -37,7 +35,7 @@ export PATH=$HOME/bin:/usr/local/bin:$PATH
 # fastfetch. Will be disabled if above colorscript was chosen to install
 #fastfetch -c $HOME/.config/fastfetch/config-compact.jsonc
 
-(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+eval "$(zoxide init zsh)"
 initconda(){
     export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=1
     if [ -f "/opt/anaconda/etc/profile.d/conda.sh" ]; then
@@ -51,12 +49,12 @@ alias openconda='initconda && conda activate base'
 #alias ls='eza -a --icons'
 #alias ll='eza -al --icons'
 #alias lt='eza -a --tree --level=1 --icons'
-(( $+commands[lsd] )) && alias ls='lsd'
+alias ls='lsd'
 alias ll='ls -lht'
-(( $+commands[zoxide] )) && alias cd='z'
+alias cd='z'
 
 # Set-up FZF key bindings (CTRL R for fuzzy history finder)
-(( $+commands[fzf] )) && source <(fzf --zsh)
+source <(fzf --zsh)
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -65,15 +63,16 @@ setopt appendhistory
 
 
 alias sudo='sudo '
-(( $+commands[nvim] )) && alias vim='nvim'
-alias nas='sudo mount -o username=wray //nas/storage /mnt/smb'
-(( $+commands[duf] )) && alias df='duf'
+alias vim='nvim'
+alias nas='sudo mount -o username=wray //10.0.0.91/d /mnt/smb'
+alias df='duf'
 alias mpvs='mpv --hwdec=vaapi --profile=low-latency --untimed --force-seekable=yes '
 alias vpn='sudo systemctl start clash'
 alias ungitvpn='git config --global --unset http.proxy ; git config --global --unset https.proxy'
-alias gitvpn='git config --global http.proxy '\''socks5://127.0.0.1:7999'\'' ; git config --global https.proxy '\''socks5://127.0.0.1:7999'\'''
+alias gitvpn='git config --global http.proxy 'socks5://127.0.0.1:7999' ; git config --global https.proxy 'socks5://127.0.0.1:7999''
 alias n2n='edge -c starstudio -k starstudio -l 160.202.250.172:7778 -f -a 223.252.0.2'
 alias typora='typora --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 '
 alias rdesktop='rdesktop -g 2850x1720 '
-alias ssh="kitty +kitten ssh"
-alias cc-switch="cc-switch-cli "
+alias kssh="kitty +kitten ssh"
+alias pip='uv pip '
+alias cc-switch="cc-switch-cli"
