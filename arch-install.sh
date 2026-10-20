@@ -33,12 +33,32 @@ wipe() { # wipe signatures on a disk and its children, children first
   lsblk -nrpo NAME "$1" | tac | xargs -rn1 wipefs -af
 }
 
+disk_of() { # disk_of /dev/sda2 -> /dev/sda ; whole disks map to themselves
+  local pk; pk=$(lsblk -ndo PKNAME "$1" 2>/dev/null || true)
+  if [[ -n $pk ]]; then echo "/dev/$pk"; else echo "$1"; fi
+}
+
+live_disk=
+live_src=$(findmnt -no SOURCE /run/archiso/bootmnt 2>/dev/null || true)
+[[ -n $live_src ]] && live_disk=$(disk_of "$live_src")
+
+check_disk() { # check_disk /dev/sdX
+  [[ -b $1 ]] || die "not a block device: $1"
+  [[ $(lsblk -ndo TYPE "$1") == disk ]] || die "$1 is not a whole disk"
+  [[ -n $live_disk && $1 == "$live_disk" ]] && die "$1 is the live medium"
+  if lsblk -nro MOUNTPOINT "$1" | grep -q .; then die "$1 has mounted partitions"; fi
+  return 0
+}
+
 # ---------- extend subcommand (run on an installed system) ----------
 if [[ ${1-} == extend ]]; then
   disk=${2-} vg=${3-} lv=${4-}
   [[ -n $disk ]] || die "usage: $0 extend /dev/sdX [vg] [lv]"
   [[ $EUID -eq 0 ]] || die "must be root"
-  [[ -b $disk ]] || die "not a block device: $disk"
+  check_disk "$disk"
+  if pvs "$disk" &>/dev/null || lsblk -nro TYPE "$disk" | grep -q lvm; then
+    die "$disk already holds LVM data"
+  fi
   src=$(findmnt -no SOURCE /); src=${src%%\[*}
   [[ -n $vg ]] || vg=$(lvs --noheadings -o vg_name "$src" | tr -d ' ')
   [[ -n $lv ]] || lv=$(lvs --noheadings -o lv_name "$src" | tr -d ' ')
@@ -47,7 +67,7 @@ if [[ ${1-} == extend ]]; then
   echo "disk=$disk  vg=$vg  lv=$lv  fs=$fstype"
   read -rp "Wipe $disk and add it to $vg (all data on it is lost). Type YES: " a
   [[ $a == YES ]] || die "aborted"
-  wipefs -af "$disk"
+  wipe "$disk"
   pvcreate -y "$disk"
   vgextend "$vg" "$disk"
   lvextend -l +100%FREE "/dev/$vg/$lv"
@@ -65,26 +85,24 @@ fi
 [[ $EUID -eq 0 ]] || die "run as root"
 [[ -d /sys/firmware/efi/efivars ]] || die "not booted in UEFI mode"
 rfkill unblock all || true
-ping -c1 -W3 archlinux.org >/dev/null 2>&1 \
+curl -fsI --max-time 10 https://archlinux.org >/dev/null 2>&1 \
   || die "no network; run 'iwctl' to connect wifi, then retry"
+
+# the ISO's pacman-init waits for NTP sync; if that never happened, init the keyring here
+if [[ -d /run/archiso ]] &&
+   ! systemctl show -p ExecMainExitTimestampMonotonic --value pacman-init | grep -q '^[1-9]'; then
+  echo "== pacman keyring not initialised yet, doing it now"
+  systemctl stop pacman-init 2>/dev/null || true
+  pacman-key --init && pacman-key --populate archlinux
+fi
+
+# leftovers from a previous failed run
+umount -R /mnt 2>/dev/null || true
+swapoff -a 2>/dev/null || true
 
 echo "== available disks =="
 lsblk -dpno NAME,SIZE,MODEL,TYPE
 echo
-
-live_disk=
-live_src=$(findmnt -no SOURCE /run/archiso/bootmnt 2>/dev/null || true)
-if [[ -n $live_src ]]; then
-  pk=$(lsblk -ndo PKNAME "$live_src" 2>/dev/null || true)
-  [[ -n $pk ]] && live_disk="/dev/$pk"
-fi
-
-check_disk() { # check_disk /dev/sdX
-  [[ -b $1 ]] || die "not a block device: $1"
-  [[ -n $live_disk && $1 == "$live_disk" ]] && die "$1 is the live medium"
-  if lsblk -nro MOUNTPOINT "$1" | grep -q .; then die "$1 has mounted partitions"; fi
-  return 0
-}
 
 ask DISK "Target disk (will be wiped)" ""
 ask EXTRA "Extra whole disks for the VG, space separated (optional)" ""
@@ -100,6 +118,15 @@ check_disk "$DISK"
 read -ra extras <<<"$EXTRA"
 for d in "${extras[@]}"; do check_disk "$d"; done
 [[ -e /usr/share/zoneinfo/$TZ ]] || die "unknown timezone: $TZ"
+[[ $USER =~ ^[a-z_][a-z0-9_-]{0,31}$ ]] || die "bad username: $USER"
+[[ $HOST =~ ^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$ ]] || die "bad hostname: $HOST"
+[[ $VG =~ ^[a-zA-Z0-9_.+]+$ ]] || die "bad VG name (no '-'): $VG"
+[[ $SWAP =~ ^(0|[0-9]+[MGT])$ ]] || die "bad swap size: $SWAP"
+# a same-named VG living on a disk we are NOT wiping would clash after the wipe
+for pv in $(pvs --noheadings -o pv_name -S vg_name="$VG" 2>/dev/null); do
+  [[ " $DISK ${extras[*]-} " == *" $(disk_of "$pv") "* ]] ||
+    die "VG '$VG' already exists on $pv, pick another name"
+done
 
 ask_pw ROOT_PW "root password"
 ask_pw USER_PW "password for $USER"
@@ -151,7 +178,6 @@ ROOT_PART=$(part "$DISK" 2)
 for d in "${extras[@]}"; do wipe "$d"; done
 
 # ---------- LVM ----------
-if vgs "$VG" &>/dev/null; then die "VG '$VG' still exists on another disk, pick another name"; fi
 pvcreate -y "$ROOT_PART"
 for d in "${extras[@]}"; do pvcreate -y "$d"; done
 vgcreate -y "$VG" "$ROOT_PART" "${extras[@]}"
@@ -164,11 +190,14 @@ lvcreate -y -l 100%FREE -n root "$VG"
 mkfs.fat -F32 "$ESP"
 mkfs.btrfs -f "/dev/mapper/$VG-root"
 mount -o noatime,compress=zstd "/dev/mapper/$VG-root" /mnt
-btrfs subvolume create /mnt/@
-btrfs subvolume create /mnt/@home
+# @ and @home: the layout timeshift's BTRFS mode expects;
+# @pkg and @log sit outside @ so snapshots skip package cache and logs
+declare -A subvols=([@]="" [@home]=home [@pkg]=var/cache/pacman/pkg [@log]=var/log)
+for sv in @ @home @pkg @log; do btrfs subvolume create "/mnt/$sv"; done
 umount /mnt
-mount -o noatime,compress=zstd,subvol=@ "/dev/mapper/$VG-root" /mnt
-mount --mkdir -o noatime,compress=zstd,subvol=@home "/dev/mapper/$VG-root" /mnt/home
+for sv in @ @home @pkg @log; do
+  mount --mkdir -o "noatime,compress=zstd,subvol=$sv" "/dev/mapper/$VG-root" "/mnt/${subvols[$sv]}"
+done
 mount --mkdir "$ESP" /mnt/boot
 if [[ $SWAP != 0 ]]; then
   mkswap "/dev/mapper/$VG-swap"
@@ -178,7 +207,8 @@ fi
 # ---------- base install ----------
 pacman -Sy --noconfirm archlinux-keyring
 pkgs=(base base-devel linux linux-firmware lvm2 btrfs-progs grub efibootmgr
-      networkmanager iwd sudo vim git openssh man-db)
+      networkmanager iwd sudo vim git openssh man-db
+      pacman-contrib timeshift grub-btrfs inotify-tools)
 [[ -n $ucode ]] && pkgs+=("$ucode")
 (( DUAL )) && pkgs+=(os-prober ntfs-3g)
 pacstrap -K /mnt "${pkgs[@]}"
@@ -191,6 +221,7 @@ hwclock --systohc
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/; s/^#zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
 echo 'LANG=en_US.UTF-8' >/etc/locale.conf
+echo 'KEYMAP=us' >/etc/vconsole.conf
 echo '$HOST' >/etc/hostname
 printf '127.0.0.1 localhost\n::1 localhost\n127.0.1.1 %s.localdomain %s\n' '$HOST' '$HOST' >/etc/hosts
 
@@ -218,7 +249,13 @@ grub-mkconfig -o /boot/grub/grub.cfg
 # NetworkManager uses iwd as the wifi backend (no wpa_supplicant installed)
 mkdir -p /etc/NetworkManager/conf.d
 printf '[device]\nwifi.backend=iwd\n' >/etc/NetworkManager/conf.d/wifi_backend.conf
-systemctl enable NetworkManager fstrim.timer
+sed -i 's/^#Color/Color/; /^#\[multilib\]/,/^#Include/ s/^#//' /etc/pacman.conf
+
+# grub-btrfsd adds timeshift snapshots to the grub menu
+mkdir -p /etc/systemd/system/grub-btrfsd.service.d
+printf '[Service]\nExecStart=\nExecStart=/usr/bin/grub-btrfsd --syslog --timeshift-auto\n' \
+  >/etc/systemd/system/grub-btrfsd.service.d/timeshift.conf
+systemctl enable NetworkManager fstrim.timer paccache.timer grub-btrfsd
 EOF
 
 # passwords via chpasswd on stdin, never written to disk
@@ -238,4 +275,10 @@ After first login:
   ssh-keygen -C "\$(whoami)@\$(uname -n)-\$(date -I)"
   curl -fsSL https://raw.githubusercontent.com/wray-lee/dotfiles/main/setup.sh | sh
 Add a disk later:  arch-install.sh extend /dev/sdX
+Snapshots: sudo timeshift --btrfs --create   (set a schedule in timeshift-gtk)
 EOF
+(( DUAL )) && cat <<'EOF'
+Dual boot: Linux keeps the RTC in UTC, Windows in local time. In Windows (admin):
+  reg add HKLM\SYSTEM\CurrentControlSet\Control\TimeZoneInformation /v RealTimeIsUniversal /t REG_DWORD /d 1 /f
+EOF
+true
