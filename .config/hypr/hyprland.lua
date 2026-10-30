@@ -123,7 +123,6 @@ hl.config({
         default_split_ratio = 1.0,
         split_bias = 0,
         precise_mouse_move = false,
-        special_scale_factor = 0.8,
     },
     master = {
         new_status = "slave",
@@ -356,6 +355,9 @@ hl.bind("XF86Launch1", hl.dsp.exec_cmd("rog-control-center"))
 ----------------------
 
 -- Common Window Tags
+-- replaces deprecated dwindle.special_scale_factor (0.8 of eDP-1's 1920x1200 logical size)
+hl.workspace_rule({ workspace = "special:special", gaps_out = { top = 120, bottom = 120, left = 192, right = 192 } })
+
 hl.window_rule({ name = "tag-browser", match = { class = "^([Ff]irefox|org[.]mozilla[.]firefox|[Ff]irefox-esr|[Ff]irefox-bin|[Gg]oogle-chrome.*|[Cc]hromium|[Mm]icrosoft-edge.*|[Bb]rave-browser.*|[Tt]horium-browser|[Cc]achy-browser|zen.*)$" }, tag = "+browser" })
 hl.window_rule({ name = "tag-terminal", match = { class = "^(ghostty|wezterm|Alacritty|kitty|kitty-dropterm)$" }, tag = "+terminal" })
 hl.window_rule({ name = "tag-projects", match = { class = "^(codium.*|VSCodium|VSCode|code.*|jetbrains-.*|dev[.]zed[.]Zed|antigravity)$" }, tag = "+projects" })
@@ -389,3 +391,6 @@ hl.layer_rule({ name = "rofi-blur", match = { namespace = "rofi" }, blur = true,
 hl.layer_rule({ name = "swaync-blur", match = { namespace = "swaync-control-center" }, blur = true, ignore_alpha = 0 })
 hl.layer_rule({ name = "swaync-notif-blur", match = { namespace = "swaync-notification-window" }, blur = true, ignore_alpha = 0 })
 hl.layer_rule({ name = "waybar-blur", match = { namespace = "waybar" }, blur = true, ignore_alpha = 0 })
+
+-- hyprmon: managed monitor profile include
+require("hyprmon")
