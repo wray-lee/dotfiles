@@ -1,0 +1,55 @@
+// Application launchers, menus, wallpaper, bar, shell themes.
+// One concern: everything here starts a program or opens an app-level menu.
+// Scripts are referenced by their contract name in ~/.config/niri/scripts/.
+binds {
+    Mod+S repeat=false hotkey-overlay-title="App launcher (rofi drun)" { spawn-sh "pkill rofi || true; exec rofi -show drun -modi drun,filebrowser,run,window"; }
+    Ctrl+Alt+B repeat=false hotkey-overlay-title="Open default browser" { spawn "xdg-open" "https://"; }
+    Mod+A repeat=false hotkey-overlay-title="Desktop overview" { toggle-overview; }
+    Mod+X repeat=false hotkey-overlay-title="Open terminal (kitty)" { spawn "kitty"; }
+    Mod+E repeat=false hotkey-overlay-title="File manager (thunar)" { spawn "thunar"; }
+    Mod+H repeat=false hotkey-overlay-title="Key bindings overlay" { show-hotkey-overlay; }
+    Mod+Shift+Slash repeat=false hotkey-overlay-title=null { show-hotkey-overlay; }
+    Mod+Alt+R repeat=false hotkey-overlay-title="Refresh bar and menus" { spawn-sh "$HOME/.config/niri/scripts/refresh.sh"; }
+    Mod+period repeat=false hotkey-overlay-title="Emoji menu" { spawn-sh "$HOME/.config/niri/scripts/rofi-emoji.sh"; }
+    // Same command as Hyprland. niri advertises wlr-foreign-toplevel-management;
+    // if the installed rofi build lacks that backend, use Alt+Tab instead.
+    Mod+Ctrl+S repeat=false hotkey-overlay-title="Window switcher" { spawn-sh "pkill rofi || true; exec rofi -show window"; }
+    Mod+Shift+K repeat=false hotkey-overlay-title="Search keybinds" { show-hotkey-overlay; }
+    Mod+Alt+V repeat=false hotkey-overlay-title="Clipboard manager" { spawn-sh "$HOME/.config/niri/scripts/clipmanager.sh"; }
+    Mod+Alt+C repeat=false hotkey-overlay-title="Calculator" { spawn-sh "$HOME/.config/niri/scripts/rofi-calc.sh"; }
+    Mod+W repeat=false hotkey-overlay-title="Select wallpaper" { spawn-sh "$HOME/.config/niri/scripts/wallpaper-select.sh"; }
+    Mod+Shift+W repeat=false hotkey-overlay-title="Wallpaper effects" { spawn-sh "$HOME/.config/niri/scripts/wallpaper-effects.sh"; }
+    Ctrl+Alt+W repeat=false hotkey-overlay-title="Random wallpaper" { spawn-sh "$HOME/.config/niri/scripts/wallpaper-random.sh"; }
+    Mod+Ctrl+Alt+B repeat=false hotkey-overlay-title="Toggle waybar" { spawn "pkill" "-SIGUSR1" "waybar"; }
+    // waybar-niri.sh owns both pickers; the chosen style is remembered in
+    // $XDG_STATE_HOME/niri/waybar-style (the shared style.css is never edited).
+    Mod+Ctrl+B repeat=false hotkey-overlay-title="Waybar styles menu" { spawn-sh "$HOME/.config/niri/scripts/waybar-niri.sh --style"; }
+    Mod+Alt+B repeat=false hotkey-overlay-title="Waybar layout menu" { spawn-sh "$HOME/.config/niri/scripts/waybar-niri.sh --layout"; }
+    Mod+N repeat=false hotkey-overlay-title="Toggle night light" { spawn-sh "$HOME/.config/niri/scripts/nightlight.sh toggle"; }
+    Mod+Shift+N repeat=false hotkey-overlay-title="Notification panel" { spawn "swaync-client" "-t" "-sw"; }
+    Mod+Shift+M repeat=false hotkey-overlay-title="Online music (rofi-beats)" { spawn-sh "$HOME/.config/niri/scripts/rofi-beats.sh"; }
+    Mod+Shift+O repeat=false hotkey-overlay-title="Change zsh theme" { spawn-sh "$HOME/.config/niri/scripts/zsh-theme.sh"; }
+    Mod+Shift+Return repeat=false hotkey-overlay-title="Dropdown terminal" { spawn-sh "$HOME/.config/niri/scripts/dropdown.sh"; }
+    Mod+Shift+G repeat=false hotkey-overlay-title="Toggle game mode" { spawn-sh "$HOME/.config/niri/scripts/gamemode.sh toggle"; }
+}
+
+// ---------------------------------------------------------------------------
+// Hyprland binds with no niri equivalent (recorded here, never silently lost).
+//
+// SUPER+CTRL+R / SUPER+CTRL+SHIFT+R  RofiThemeSelector{,-modified}.sh
+//   Not bound: no rofi-theme switcher in the niri contract. Closest native
+//   alternative is scripts/theme-select.sh (wallust palette), reachable from
+//   the bar's custom/light_dark module; rofi themes themselves are still
+//   edited in ~/.config/rofi/*.rasi.
+// SUPER+SHIFT+E  Kool_Quick_Settings.sh
+//   No niri equivalent (it was a compositor-specific wrapper). Alternative: the swaync
+//   control center (SUPER+SHIFT+N) plus the relevant waybar module clicks.
+// SUPER+SHIFT+A  Animations.sh
+//   niri animations are static config (conf/animations.kdl); there is no
+//   runtime preset menu. Edit that file - niri hot-reloads on save.
+// SUPER+CTRL+B / SUPER+ALT+B  WaybarStyles.sh / WaybarLayout.sh
+//   style -> waybar-niri.sh --style, layout -> waybar-niri.sh --layout
+//   (both bound above; the style choice is remembered in $XDG_STATE_HOME).
+// SUPER+ALT+O (ChangeBlur.sh) lives in windows.kdl (opacity rule toggle).
+// SUPER+ALT+L (ChangeLayout.sh) lives in windows.kdl (column width preset).
+// ---------------------------------------------------------------------------

@@ -1,0 +1,41 @@
+// conf/startup.kdl
+// ONE concern: which processes niri starts once, in what order.
+// Daemon configuration belongs to the daemons' own files (idle/hypridle.conf,
+// waybar/, ...); this file only starts them. Nothing here is supervised, just
+// like Hyprland exec-once. niri-session already imported the login environment
+// into systemd and D-Bus, so dbus-update-activation-environment is not needed.
+
+// Authentication dialogs first, so the session can prompt as soon as it starts.
+spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/polkit.sh\""
+
+// Wallpaper: starts awww-daemon and restores the last image on every output.
+spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/wallpaper-daemon.sh\""
+
+// Restore the previous night-light state (Hyprland ran Hyprsunset.sh init here).
+spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/nightlight.sh\" init"
+
+// Notification daemon and status bar. scripts/waybar-niri.sh owns the bar's
+// config/style paths (the "Laptop" variant avoids its interactive picker).
+spawn-at-startup "swaync"
+spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/waybar-niri.sh\" Laptop"
+
+// Idle/lock handling (niri-tuned config, idle/hypridle.conf).
+spawn-at-startup "sh" "-c" "exec hypridle -c \"$HOME/.config/niri/idle/hypridle.conf\""
+
+// Pre-warm the dropdown terminal on the hidden "scratch" workspace, like
+// Hyprland's exec-once Dropterminal.sh (first Mod+Shift+Return is instant).
+spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/dropdown.sh\" --prewarm"
+
+// Input method.
+spawn-at-startup "fcitx5" "-d"
+
+// Clipboard history: one watcher per mime type, both feeding `cliphist store`.
+spawn-at-startup "wl-paste" "--type" "text" "--watch" "cliphist" "store"
+spawn-at-startup "wl-paste" "--type" "image" "--watch" "cliphist" "store"
+
+// Tray applets.
+spawn-at-startup "nm-applet" "--indicator"
+spawn-at-startup "blueman-applet"
+
+// xwayland-satellite is intentionally absent: niri starts it on demand from the
+// xwayland-satellite { } block in conf/misc.kdl.

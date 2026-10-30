@@ -1,0 +1,80 @@
+// conf/misc.kdl
+// ONE concern: compositor-wide toggles that are not input, output, layout,
+// animation or startup settings.
+
+// Client-side decorations are left to clients, matching Hyprland (Firefox and
+// other CSD apps keep their own titlebars). prefer-no-csd is deliberately NOT
+// set: it would ask clients to drop CSD and let niri draw server-side
+// decorations, a visible change from the Hyprland session.
+
+// niri's own screenshot action (bound in conf/binds/screenshot.kdl) saves here;
+// the same directory the Hyprland screenshots used.
+screenshot-path "~/Pictures/Screenshots/Screenshot %Y-%m-%d %H-%M-%S.png"
+
+// Cursor theme/size: the single source of truth. niri exports XCURSOR_THEME and
+// XCURSOR_SIZE to clients, which is why conf/environment.kdl does not set them.
+cursor {
+    xcursor-theme "Bibata-Modern-Ice"
+    xcursor-size 24
+}
+
+// Do not cover the screen with the key-help overlay at login; it stays
+// available on demand (bind in conf/binds/media-system.kdl).
+hotkey-overlay {
+    skip-at-startup
+}
+
+// Hyprland had no overview; these defaults make it feel close to the tiling
+// view (moderate zoom, dark backdrop, no heavy workspace shadows).
+overview {
+    zoom 0.5
+    backdrop-color "#101010"
+    workspace-shadow {
+        off
+    }
+}
+
+// Hyprland's top-left corner is not a hot corner (its overview is a keybind),
+// so turn niri's default hot corner off. Drag-and-drop edge scrolling and edge
+// workspace switching keep their niri defaults (enabled: 30 px trigger,
+// 1500 px/s max).
+gestures {
+    hot-corners {
+        off
+    }
+}
+
+// Global blur quality, matching Hyprland size 6 / passes 3 / no noise / no
+// saturation boost. Which surfaces blur is decided per window/layer rule.
+blur {
+    passes 3
+    offset 6
+    noise 0.0
+    saturation 1.0
+}
+
+// X11 apps run through xwayland-satellite, started on demand by niri (no
+// startup entry needed). DISPLAY is set automatically.
+xwayland-satellite {
+    path "xwayland-satellite"
+}
+
+// Lid switch (niri 25.08+). niri itself does not act on the lid; it only
+// reports the event, and scripts/lid.sh applies the panel policy (external
+// monitor present -> internal panel off; otherwise logind suspends).
+// Use either these events or `lid.sh watch`, never both.
+// Scripts are invoked through bash so they work before/without a +x bit.
+switch-events {
+    lid-close {
+        spawn "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/lid.sh\" close"
+    }
+    lid-open {
+        spawn "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/lid.sh\" open"
+    }
+}
+
+// tablet-mode switch events (tablet-mode-on/off) are intentionally not bound:
+// no on-screen keyboard is installed in this setup (Hyprland had none either).
+// To add one, install squeekboard and bind:
+//     tablet-mode-on  { spawn "sh" "-c" "pgrep -x squeekboard || exec squeekboard"; }
+//     tablet-mode-off { spawn "sh" "-c" "pkill -x squeekboard"; }

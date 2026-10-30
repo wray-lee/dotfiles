@@ -1,0 +1,35 @@
+// conf/environment.kdl
+// ONE concern: the environment every Wayland/X11 client inherits.
+// Cursor theme and size are deliberately absent: the cursor { } block in
+// conf/misc.kdl owns them and exports XCURSOR_THEME / XCURSOR_SIZE itself.
+
+environment {
+    // Session identity (portals, xdg-desktop-portal, logind, Electron apps).
+    XDG_CURRENT_DESKTOP "niri"
+    XDG_SESSION_DESKTOP "niri"
+    XDG_SESSION_TYPE "wayland"
+
+    // Qt: Wayland first, X11 fallback for legacy apps.
+    QT_QPA_PLATFORM "wayland;xcb"
+    QT_QPA_PLATFORMTHEME "qt6ct"
+    QT_AUTO_SCREEN_SCALE_FACTOR "1"
+    QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
+    QT_SCALE_FACTOR_ROUNDING_POLICY "RoundPreferFloor"
+
+    // Browsers / Electron.
+    MOZ_ENABLE_WAYLAND "1"
+    ELECTRON_OZONE_PLATFORM_HINT "auto"
+
+    EDITOR "nvim"
+
+    // fcitx5 input method. GLFW covers kitty; SDL covers games.
+    XMODIFIERS "@im=fcitx"
+    GTK_IM_MODULE "fcitx"
+    QT_IM_MODULE "fcitx"
+    SDL_IM_MODULE "fcitx"
+    GLFW_IM_MODULE "fcitx"
+}
+
+// Deliberately NOT set: GDK_BACKEND. Setting it globally disables the GTK
+// backend that xdg-desktop-portal-gnome needs for screencasting. GTK picks
+// Wayland on its own under niri.

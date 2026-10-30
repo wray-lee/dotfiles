@@ -1,0 +1,43 @@
+// conf/animations.kdl
+// ONE concern: how long every animation takes and which curve it uses.
+// Hyprland was configured with speed values; the durations below are their
+// niri equivalents (Hyprland speed 5-6 ~ 250-300 ms, 3 ~ 150 ms).
+
+animations {
+    window-open {
+        duration-ms 250
+        curve "ease-out-expo"
+    }
+    window-close {
+        duration-ms 150
+        curve "ease-out-quad"
+    }
+    window-movement {
+        duration-ms 300
+        curve "ease-out-expo"
+    }
+    window-resize {
+        duration-ms 250
+        curve "ease-out-expo"
+    }
+    horizontal-view-movement {
+        duration-ms 400
+        curve "ease-out-expo"
+    }
+    workspace-switch {
+        duration-ms 350
+        curve "ease-out-expo"
+    }
+    screenshot-ui-open {
+        duration-ms 150
+        curve "ease-out-quad"
+    }
+    config-notification-open-close {
+        duration-ms 150
+        curve "ease-out-quad"
+    }
+    overview-open-close {
+        duration-ms 300
+        curve "ease-out-expo"
+    }
+}

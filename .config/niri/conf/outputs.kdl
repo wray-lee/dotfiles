@@ -1,0 +1,34 @@
+// conf/outputs.kdl
+// ONE concern: monitor identity, mode, scale, position and VRR.
+// The only file that knows about connectors or monitor models.
+//
+// Outputs are matched by connector name (eDP-1, HDMI-A-1, ...) or by
+// "manufacturer model serial", exactly as printed by `niri msg outputs`.
+// Refresh rates need exactly three decimals and must match an advertised mode.
+
+// Laptop panel. "eDP-1" is the conventional name for the built-in display;
+// confirm it on the new laptop with `niri msg outputs` and rename the block if
+// it differs. Values ported from the Hyprland rule for the Lenovo panel
+// (2880x1800@60, scale 1.5, placed below the external monitor at y=1440).
+output "eDP-1" {
+    mode "2880x1800@60.000"
+    scale 1.5
+    position x=0 y=1440
+    // Hyprland misc.vrr = 2 -> VRR only when a window asks for it.
+    variable-refresh-rate on-demand=true
+    focus-at-startup
+}
+
+// Hisense external monitor, matched by make/model/serial so the rule survives
+// a different connector (HDMI vs DisplayPort) on the new laptop.
+// Hyprland source: desc:Hisense Electric Co. Ltd. HISENSE 0x01010101
+output "Hisense Electric Co. Ltd. HISENSE 0x01010101" {
+    mode "2560x1440@59.951"
+    scale 1.0
+    position x=1920 y=0
+    variable-refresh-rate on-demand=true
+}
+
+// Any other monitor needs no block: niri turns unmatched outputs on with their
+// preferred mode, scale 1.0 and an automatic position. Hyprland's
+// output="" fallback is therefore built in, not duplicated here.

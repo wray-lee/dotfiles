@@ -1,0 +1,34 @@
+// Mouse wheel, touchpad and touchscreen.
+// Mod+LMB drag and Mod+RMB resize are built into niri; do not bind them.
+// Touchscreens are handled natively by niri (tap to focus, touch scroll);
+// the touchscreen-relevant bind is the overview toggle, Mod+A in apps.kdl.
+binds {
+    XF86TouchpadToggle repeat=false hotkey-overlay-title="Toggle touchpad" { spawn-sh "$HOME/.config/niri/scripts/touchpad.sh toggle"; }
+    Mod+Shift+T repeat=false hotkey-overlay-title="Toggle touchpad" { spawn-sh "$HOME/.config/niri/scripts/touchpad.sh toggle"; }
+
+    Mod+WheelScrollDown cooldown-ms=150 repeat=false hotkey-overlay-title="Workspace down" { focus-workspace-down; }
+    Mod+WheelScrollUp cooldown-ms=150 repeat=false hotkey-overlay-title="Workspace up" { focus-workspace-up; }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 repeat=false hotkey-overlay-title="Move column to workspace down" { move-column-to-workspace-down; }
+    Mod+Ctrl+WheelScrollUp cooldown-ms=150 repeat=false hotkey-overlay-title="Move column to workspace up" { move-column-to-workspace-up; }
+    Mod+WheelScrollRight repeat=false hotkey-overlay-title="Focus column right" { focus-column-right; }
+    Mod+WheelScrollLeft repeat=false hotkey-overlay-title="Focus column left" { focus-column-left; }
+    Mod+Ctrl+WheelScrollRight repeat=false hotkey-overlay-title="Move column right" { move-column-right; }
+    Mod+Ctrl+WheelScrollLeft repeat=false hotkey-overlay-title="Move column left" { move-column-left; }
+}
+
+// ---------------------------------------------------------------------------
+// Gaps vs Hyprland (closest native behaviour bound above or documented).
+//
+// Keyboard layout: Hyprland had a single layout ("us") and switched it on
+//   ALT_L+SHIFT_L release. niri has no modifier-only binds and, with one xkb
+//   layout (conf/input.kdl), switch-layout is a no-op, so it is not bound.
+//   If a second layout is added to conf/input.kdl, bind
+//   { switch-layout "next"; }.
+// Touchpad toggle: niri 26.04 rejects the toggle-touchpad action in binds;
+//   touchpad.sh rewrites conf/local/touchpad.kdl (hot-reloaded). On niri
+//   >= 26.05 replace both binds with { toggle-touchpad; } and drop the script.
+// Desktop/cursor zoom (SUPER+ALT+mouse wheel): niri has no zoom; no in-
+//   compositor alternative (use an external magnification tool).
+// Touchpad gesture tuning (Hyprland `gestures { ... }`): niri's three-finger
+//   vertical swipe and Mod+drag gestures are built in and not configurable.
+// ---------------------------------------------------------------------------

@@ -1,0 +1,35 @@
+// niri entry point — include lines only, no settings live here.
+//
+// One concern per file; each static value is written in exactly one file.
+// Include order is positional (a later include overrides an earlier one).
+// Only the generated conf/local/*.kdl files rely on that: they intentionally
+// repeat input/touchpad and layout keys to override conf/input.kdl and
+// conf/layout.kdl at runtime.
+
+// --- core behaviour -------------------------------------------------------
+include "conf/environment.kdl"       // process environment for Wayland clients
+include "conf/input.kdl"             // keyboard, touchpad, mouse, touch, tablet
+include "conf/outputs.kdl"           // monitor identity, mode, scale, position, VRR
+include "conf/layout.kdl"            // gaps, borders, shadows, column widths
+include "conf/animations.kdl"        // animation timings and easing curves
+include "conf/misc.kdl"              // cursor, blur, overview, gestures, switches
+include "conf/startup.kdl"           // autostarted processes
+include "conf/window-rules.kdl"      // per-window behaviour
+include "conf/layer-rules.kdl"       // per-layer-surface behaviour
+
+// --- generated runtime overrides ------------------------------------------
+// Written by scripts/touchpad.sh and scripts/gamemode.sh, never by hand.
+// They must come last so their input/layout values win over conf/*.kdl.
+// The placeholder files exist so this include never fails at login.
+include "conf/local/touchpad.kdl"
+include "conf/local/gamemode.kdl"
+
+// --- key bindings ---------------------------------------------------------
+// Each file is its own binds { } block; niri merges all of them, so the
+// category split owes nothing to a shared registry or include order.
+include "conf/binds/apps.kdl"        // launchers, terminal, file manager, menus
+include "conf/binds/windows.kdl"     // focus, move, resize, fullscreen, float
+include "conf/binds/workspaces.kdl"  // workspace focus, move, output
+include "conf/binds/media-system.kdl" // volume, brightness, media keys, system
+include "conf/binds/screenshot.kdl"  // screenshots
+include "conf/binds/mouse-touch.kdl" // mouse buttons, scroll, touch

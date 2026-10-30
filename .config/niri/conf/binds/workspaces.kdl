@@ -1,0 +1,65 @@
+// Workspace declarations + navigation.
+// niri workspaces are dynamic and vertical per output. They are named here to
+// keep Hyprland's fixed SUPER+1..0 muscle memory and to keep them alive when
+// empty. This is the only place "1".."10" and "scratch" are declared.
+workspace "1"
+workspace "2"
+workspace "3"
+workspace "4"
+workspace "5"
+workspace "6"
+workspace "7"
+workspace "8"
+workspace "9"
+workspace "10"
+workspace "scratch"
+
+// Workspace and monitor navigation.
+binds {
+    Mod+Tab repeat=false hotkey-overlay-title="Next workspace" { focus-workspace-down; }
+    Mod+Shift+Tab repeat=false hotkey-overlay-title="Previous workspace" { focus-workspace-up; }
+    // Restores Hyprland's binds.workspace_back_and_forth = true
+    Mod+grave repeat=false hotkey-overlay-title="Previous workspace" { focus-workspace-previous; }
+    Mod+Ctrl+bracketleft repeat=false hotkey-overlay-title="Move column to previous workspace" { move-column-to-workspace-up; }
+    Mod+Ctrl+bracketright repeat=false hotkey-overlay-title="Move column to next workspace" { move-column-to-workspace-down; }
+    Mod+Shift+Left repeat=false hotkey-overlay-title="Workspace to left monitor" { move-workspace-to-monitor-left; }
+    Mod+Shift+Right repeat=false hotkey-overlay-title="Workspace to right monitor" { move-workspace-to-monitor-right; }
+    Mod+Shift+Up repeat=false hotkey-overlay-title="Workspace to up monitor" { move-workspace-to-monitor-up; }
+    Mod+Shift+Down repeat=false hotkey-overlay-title="Workspace to down monitor" { move-workspace-to-monitor-down; }
+
+    Mod+1 repeat=false hotkey-overlay-title="Workspace 1" { focus-workspace "1"; }
+    Mod+2 repeat=false hotkey-overlay-title="Workspace 2" { focus-workspace "2"; }
+    Mod+3 repeat=false hotkey-overlay-title="Workspace 3" { focus-workspace "3"; }
+    Mod+4 repeat=false hotkey-overlay-title="Workspace 4" { focus-workspace "4"; }
+    Mod+5 repeat=false hotkey-overlay-title="Workspace 5" { focus-workspace "5"; }
+    Mod+6 repeat=false hotkey-overlay-title="Workspace 6" { focus-workspace "6"; }
+    Mod+7 repeat=false hotkey-overlay-title="Workspace 7" { focus-workspace "7"; }
+    Mod+8 repeat=false hotkey-overlay-title="Workspace 8" { focus-workspace "8"; }
+    Mod+9 repeat=false hotkey-overlay-title="Workspace 9" { focus-workspace "9"; }
+    Mod+0 repeat=false hotkey-overlay-title="Workspace 10" { focus-workspace "10"; }
+
+    Mod+Ctrl+1 repeat=false hotkey-overlay-title="Move column to workspace 1" { move-column-to-workspace "1"; }
+    Mod+Ctrl+2 repeat=false hotkey-overlay-title="Move column to workspace 2" { move-column-to-workspace "2"; }
+    Mod+Ctrl+3 repeat=false hotkey-overlay-title="Move column to workspace 3" { move-column-to-workspace "3"; }
+    Mod+Ctrl+4 repeat=false hotkey-overlay-title="Move column to workspace 4" { move-column-to-workspace "4"; }
+    Mod+Ctrl+5 repeat=false hotkey-overlay-title="Move column to workspace 5" { move-column-to-workspace "5"; }
+    Mod+Ctrl+6 repeat=false hotkey-overlay-title="Move column to workspace 6" { move-column-to-workspace "6"; }
+    Mod+Ctrl+7 repeat=false hotkey-overlay-title="Move column to workspace 7" { move-column-to-workspace "7"; }
+    Mod+Ctrl+8 repeat=false hotkey-overlay-title="Move column to workspace 8" { move-column-to-workspace "8"; }
+    Mod+Ctrl+9 repeat=false hotkey-overlay-title="Move column to workspace 9" { move-column-to-workspace "9"; }
+    Mod+Ctrl+0 repeat=false hotkey-overlay-title="Move column to workspace 10" { move-column-to-workspace "10"; }
+
+    // Hyprland special workspace -> named workspace "scratch"
+    // Toggle: a second press returns to the previous workspace.
+    Mod+U repeat=false hotkey-overlay-title="Scratch workspace" { spawn-sh "$HOME/.config/niri/scripts/scratch-toggle.sh"; }
+    Mod+Shift+U repeat=false hotkey-overlay-title="Move column to scratch workspace" { move-column-to-workspace "scratch"; }
+}
+
+// ---------------------------------------------------------------------------
+// Gap vs Hyprland: special:special was an overlay/scratchpad pinned over the
+// active workspace. niri has no overlay workspace; "scratch" is a normal named
+// workspace. scripts/dropdown.sh moves the dropdown terminal there to hide it
+// (see conf/window-rules.kdl for the matching window rule).
+// Moving a window to a workspace moves the whole column (niri model); use the
+// move-window-to-workspace action if a single window must be left behind.
+// ---------------------------------------------------------------------------

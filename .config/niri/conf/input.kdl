@@ -1,0 +1,73 @@
+// conf/input.kdl
+// ONE concern: how input devices behave (keyboard, touchpad, mouse, touch,
+// tablet). Monitor geometry lives in conf/outputs.kdl; the cursor theme and
+// size live in conf/misc.kdl; configurable gestures live in conf/misc.kdl.
+
+input {
+    keyboard {
+        // fcitx5 runs as a Wayland input-method client, so no XKB-level IM
+        // option is needed here; layout is the US keymap the user types on.
+        xkb {
+            layout "us"
+        }
+        numlock
+        repeat-delay 300
+        repeat-rate 50
+    }
+
+    touchpad {
+        tap
+        dwt
+        natural-scroll
+        scroll-method "two-finger"
+        // Prevents the palm/touchpad from fighting a real mouse on the new
+        // laptop (replaces the manual Hyprland touchpad toggle for this case).
+        disabled-on-external-mouse
+        // niri's default; stated explicitly for parity with the Hyprland setup.
+        accel-profile "adaptive"
+    }
+
+    mouse {
+        accel-profile "adaptive"
+    }
+
+    // --- touchscreen -------------------------------------------------------
+    // Pin the panel's touchscreen to the internal output (niri 26.04 supports
+    // map-to-output for touch). Without this, libinput maps touch to the union
+    // of all outputs and taps land on the wrong screen once an external
+    // monitor is attached.
+    //
+    // The connector is the one value repeated outside conf/outputs.kdl: KDL
+    // cannot alias strings, and an input device must name its target. If the
+    // new laptop calls its panel eDP-2/DSI-1, change it in both files (run
+    // `niri msg outputs` first). A wrong name is ignored: touch falls back to
+    // the union instead of breaking.
+    touch {
+        map-to-output "eDP-1"
+    }
+
+    // A stylus follows whichever output is focused, so a pen works on the
+    // laptop panel and on the external monitor without a hardcoded connector.
+    // (map-to-focused-output: niri 26.04.)
+    tablet {
+        map-to-focused-output
+    }
+
+    // --- gestures ----------------------------------------------------------
+    // Built into niri, not configurable:
+    //   touchpad 3-finger horizontal swipe -> move the view / switch columns
+    //   touchpad 3-finger vertical swipe   -> switch workspace
+    //   touchpad 4-finger vertical swipe   -> open/close the overview
+    //   touch / mouse Mod+drag             -> move window (drag sideways to
+    //                                         scroll a tiled column)
+    //   mouse Mod+middle-drag              -> move view / switch workspace
+    // Hyprland's workspace_swipe_* tuning has no niri equivalent; niri's
+    // defaults are used as-is. The configurable gesture block (hot corners,
+    // drag-and-drop edge scrolling) lives in conf/misc.kdl.
+
+    // Parity with Hyprland input.follow_mouse = 1: focus follows the pointer,
+    // but not when hovering empty space.
+    focus-follows-mouse max-scroll-amount="0%"
+    // Parity with Hyprland binds.workspace_back_and_forth = true.
+    workspace-auto-back-and-forth
+}

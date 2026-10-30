@@ -1,0 +1,77 @@
+// Window state, column layout, focus/move/resize.
+// niri model: columns run horizontally; each column stacks windows vertically.
+binds {
+    Mod+Shift+F repeat=false hotkey-overlay-title="Fullscreen" { fullscreen-window; }
+    Mod+Ctrl+F repeat=false hotkey-overlay-title="Maximize column" { maximize-column; }
+    Alt+Space repeat=false hotkey-overlay-title="Toggle floating" { toggle-window-floating; }
+    Mod+Alt+Space repeat=false hotkey-overlay-title="Float all windows on workspace" { spawn-sh "$HOME/.config/niri/scripts/float-all.sh on"; }
+    Mod+D repeat=false hotkey-overlay-title="Close window" { close-window; }
+    Mod+Escape repeat=false hotkey-overlay-title="Close window" { close-window; }
+    Alt+F4 repeat=false hotkey-overlay-title="Kill active process" { spawn-sh "$HOME/.config/niri/scripts/kill-window.sh"; }
+    Ctrl+Alt+Delete repeat=false hotkey-overlay-title="Exit niri" { quit; }
+    Mod+Ctrl+O repeat=false hotkey-overlay-title="Toggle window opacity rule" { toggle-window-rule-opacity; }
+    Mod+T repeat=false hotkey-overlay-title="Toggle window opacity rule" { toggle-window-rule-opacity; }
+    // SUPER+ALT+O toggled blur for the focused window. niri 26.04 has global
+    // and per-rule blur (conf/misc.kdl, conf/window-rules.kdl) but no runtime
+    // blur toggle action; the closest native action is the per-window opacity
+    // rule toggle.
+    Mod+Alt+O repeat=false hotkey-overlay-title="Toggle window opacity (no runtime blur toggle)" { toggle-window-rule-opacity; }
+    // SUPER+ALT+L toggled master/dwindle. niri columns are linear; closest
+    // native action is cycling the column width preset.
+    Mod+Alt+L repeat=false hotkey-overlay-title="Cycle column width preset" { switch-preset-column-width; }
+
+    // Pseudo tiling: niri has no pseudo tiles -> float instead
+    Mod+P repeat=false hotkey-overlay-title="Pseudo tile (float)" { toggle-window-floating; }
+    // Split direction: niri columns are linear -> tabbed column display
+    Mod+Shift+I repeat=false hotkey-overlay-title="Toggle tabbed column" { toggle-column-tabbed-display; }
+    // addmaster / removemaster -> merge into / split out of column
+    Mod+I repeat=false hotkey-overlay-title="Consume window into column" { consume-window-into-column; }
+    Mod+Ctrl+D repeat=false hotkey-overlay-title="Expel window from column" { expel-window-from-column; }
+    // swap with master -> move column to first position
+    Mod+Ctrl+Return repeat=false hotkey-overlay-title="Move column to first" { move-column-to-first; }
+    // split ratio 0.3 -> fixed column width
+    Mod+M repeat=false hotkey-overlay-title="Set column width 30 percent" { set-column-width "30%"; }
+    // groups -> tabbed columns
+    Mod+G repeat=false hotkey-overlay-title="Toggle tabbed column (group)" { toggle-column-tabbed-display; }
+    Mod+Ctrl+Tab repeat=false hotkey-overlay-title="Next window in column" { focus-window-down; }
+    Mod+Ctrl+Shift+Tab repeat=false hotkey-overlay-title="Previous window in column" { focus-window-up; }
+    Mod+Ctrl+K repeat=false hotkey-overlay-title="Consume or expel window left" { consume-or-expel-window-left; }
+    Mod+Ctrl+L repeat=false hotkey-overlay-title="Consume or expel window right" { consume-or-expel-window-right; }
+    Mod+Ctrl+H repeat=false hotkey-overlay-title="Expel window from column" { expel-window-from-column; }
+
+    Mod+Left repeat=false hotkey-overlay-title="Move column left" { move-column-left; }
+    Mod+Right repeat=false hotkey-overlay-title="Move column right" { move-column-right; }
+    Mod+Up repeat=false hotkey-overlay-title="Move window up" { move-window-up; }
+    Mod+Down repeat=false hotkey-overlay-title="Move window down" { move-window-down; }
+    Ctrl+Alt+Left repeat=false hotkey-overlay-title="Focus left" { focus-column-or-monitor-left; }
+    Ctrl+Alt+Right repeat=false hotkey-overlay-title="Focus right" { focus-column-or-monitor-right; }
+    Ctrl+Alt+Up repeat=false hotkey-overlay-title="Focus up" { focus-window-or-monitor-up; }
+    Ctrl+Alt+Down repeat=false hotkey-overlay-title="Focus down" { focus-window-or-monitor-down; }
+    // Alt+Tab = most-recently-used previous window (no cycle stack in niri).
+    Alt+Tab repeat=false hotkey-overlay-title="Previous window" { focus-window-previous; }
+
+    // Repeating resize (Hyprland had repeating = true -> repeat stays enabled).
+    Mod+Alt+Left hotkey-overlay-title="Narrow column" { set-column-width "-5%"; }
+    Mod+Alt+Right hotkey-overlay-title="Widen column" { set-column-width "+5%"; }
+    Mod+Alt+Up hotkey-overlay-title="Shorten window" { set-window-height "-5%"; }
+    Mod+Alt+Down hotkey-overlay-title="Heighten window" { set-window-height "+5%"; }
+}
+
+// ---------------------------------------------------------------------------
+// Model differences / gaps (closest native behaviour is bound above).
+//
+// Blur (SUPER+ALT+O): niri 26.04 blurs globally/per rule (conf/misc.kdl,
+//   conf/window-rules.kdl) but has no runtime toggle action; bound to the
+//   opacity-rule toggle instead.
+// Opacity presets (SUPER+CTRL+O, SUPER+T): the static values are in
+//   conf/window-rules.kdl (active/inactive per app). niri has no runtime
+//   global opacity preset; toggle-window-rule-opacity adds/removes a rule on
+//   the focused window, which is the closest native action.
+// Desktop/cursor zoom (SUPER+ALT+wheel): niri has no zoom; use an external
+//   magnification tool.
+// Floating windows: keyboard move/resize actions are rejected in binds;
+//   use Mod+LMB to move and Mod+RMB to resize.
+// Alt+Tab: niri only provides MRU `focus-window-previous`, not a cycle stack.
+//   The second Hyprland action on Alt+Tab (bringactivetotop) has no niri
+//   equivalent; focusing a window already raises it.
+// ---------------------------------------------------------------------------

@@ -1,0 +1,38 @@
+// Hardware/media keys, lock, power.
+// allow-when-locked=true keeps volume and media usable on the lock screen.
+// Volume/brightness keys repeat (no repeat=false); one-shot keys do not.
+binds {
+    Mod+L repeat=false hotkey-overlay-title="Lock screen" { spawn-sh "$HOME/.config/niri/scripts/lock.sh"; }
+    Ctrl+Alt+P repeat=false hotkey-overlay-title="Power menu" { spawn-sh "$HOME/.config/niri/scripts/wlogout.sh"; }
+
+    XF86AudioRaiseVolume allow-when-locked=true hotkey-overlay-title="Volume up" { spawn-sh "$HOME/.config/niri/scripts/volume.sh --inc"; }
+    XF86AudioLowerVolume allow-when-locked=true hotkey-overlay-title="Volume down" { spawn-sh "$HOME/.config/niri/scripts/volume.sh --dec"; }
+    XF86AudioMute allow-when-locked=true hotkey-overlay-title="Mute" { spawn-sh "$HOME/.config/niri/scripts/volume.sh --toggle"; }
+    XF86AudioMicMute allow-when-locked=true hotkey-overlay-title="Mute microphone" { spawn-sh "$HOME/.config/niri/scripts/volume.sh --toggle-mic"; }
+    XF86Sleep allow-when-locked=true repeat=false hotkey-overlay-title="Suspend" { spawn "systemctl" "suspend"; }
+    XF86Rfkill allow-when-locked=true repeat=false hotkey-overlay-title="Airplane mode" { spawn-sh "$HOME/.config/niri/scripts/airplane.sh"; }
+    XF86AudioPlay allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn-sh "$HOME/.config/niri/scripts/media.sh --pause"; }
+    XF86AudioPause allow-when-locked=true repeat=false hotkey-overlay-title="Play/pause" { spawn-sh "$HOME/.config/niri/scripts/media.sh --pause"; }
+    XF86AudioNext allow-when-locked=true repeat=false hotkey-overlay-title="Next track" { spawn-sh "$HOME/.config/niri/scripts/media.sh --nxt"; }
+    XF86AudioPrev allow-when-locked=true repeat=false hotkey-overlay-title="Previous track" { spawn-sh "$HOME/.config/niri/scripts/media.sh --prv"; }
+    XF86AudioStop allow-when-locked=true repeat=false hotkey-overlay-title="Stop playback" { spawn-sh "$HOME/.config/niri/scripts/media.sh --stop"; }
+    XF86MonBrightnessUp allow-when-locked=true hotkey-overlay-title="Brightness up" { spawn-sh "$HOME/.config/niri/scripts/brightness.sh --inc"; }
+    XF86MonBrightnessDown allow-when-locked=true hotkey-overlay-title="Brightness down" { spawn-sh "$HOME/.config/niri/scripts/brightness.sh --dec"; }
+    XF86KbdBrightnessUp allow-when-locked=true hotkey-overlay-title="Keyboard backlight up" { spawn-sh "$HOME/.config/niri/scripts/brightness-kbd.sh --inc"; }
+    XF86KbdBrightnessDown allow-when-locked=true hotkey-overlay-title="Keyboard backlight down" { spawn-sh "$HOME/.config/niri/scripts/brightness-kbd.sh --dec"; }
+
+    // ASUS ROG hardware keys (harmless no-ops on other laptops).
+    XF86Launch1 repeat=false hotkey-overlay-title="ROG Control Center" { spawn "rog-control-center"; }
+    XF86Launch3 repeat=false hotkey-overlay-title="Keyboard RGB profile" { spawn "asusctl" "led-mode" "-n"; }
+    XF86Launch4 repeat=false hotkey-overlay-title="Fan profile" { spawn "asusctl" "profile" "-n"; }
+}
+
+// Touchpad toggle is bound in mouse-touch.kdl (it is a pointer concern).
+//
+// Unmapped: XF86AudioPlayPause (from configs/Keybinds.conf). niri rejects that
+// key name ("invalid key"); the same action is already covered by the
+// XF86AudioPlay and XF86AudioPause binds above.
+//
+// Hyprland used release binds (bindld/bindeld) for most hardware keys. niri
+// has no release binds; all of these fire on press, which is visually
+// identical for volume, brightness and transport keys.

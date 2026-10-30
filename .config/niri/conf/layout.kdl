@@ -1,0 +1,60 @@
+// conf/layout.kdl
+// ONE concern: geometry and decoration of the tiling layout.
+// Animation timings live in conf/animations.kdl; per-window corner rounding and
+// opacity are window rules, not layout settings.
+
+layout {
+    // Hyprland had gaps_in 2 / gaps_out 4; niri uses one gap value for both.
+    gaps 4
+    center-focused-column "never"
+
+    // Hyprland dwindle default_split_ratio = 1.0 -> new columns take half.
+    default-column-width {
+        proportion 0.5
+    }
+    preset-column-widths {
+        proportion 0.33333
+        proportion 0.5
+        proportion 0.66667
+    }
+    preset-window-heights {
+        proportion 0.5
+        proportion 0.66667
+    }
+
+    // Hyprland border_size 2 with an active and an inactive colour, drawn on
+    // every window. niri's focus-ring only outlines the focused window, so the
+    // border (which also shows inactive-color) is the faithful replacement.
+    focus-ring {
+        off
+    }
+    border {
+        width 2
+        active-color "#8db4ff"
+        inactive-color "#5f6578"
+    }
+
+    // Hyprland shadow range 3, colored rgba(8db4ffff) -> softer alpha here so
+    // it still reads as a shadow.
+    shadow {
+        on
+        softness 30
+        spread 2
+        offset x=0 y=0
+        color "#8db4ff40"
+    }
+
+    tab-indicator {
+        hide-when-single-tab
+        place-within-column
+        gap 5
+        width 4
+        length total-proportion=1.0
+        active-color "#8db4ff"
+        inactive-color "#5f6578"
+    }
+
+    insert-hint {
+        color "#8db4ff80"
+    }
+}

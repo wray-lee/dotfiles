@@ -1,0 +1,24 @@
+/* niri power menu: same look as the Hyprland one, colors from waybar/wallust. */
+@import '../../waybar/wallust/colors-waybar.css';
+
+window {
+    font-size: 24pt;
+    color: @foreground;
+    background-color: rgba(30, 30, 46, 0.8);
+}
+
+button {
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20%;
+    background-color: rgba(200, 220, 255, 0);
+    transition: all 0.3s cubic-bezier(.55, 0.0, .28, 1.682), box-shadow 0.2s;
+    border-radius: 12px;
+    border: 2px solid @color8;
+    color: @foreground;
+}
+
+button:hover {
+    background-color: @color12;
+    color: @background;
+}

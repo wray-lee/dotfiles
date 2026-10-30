@@ -1,0 +1,207 @@
+// conf/window-rules.kdl
+// ---------------------------------------------------------------------------
+// ONE concern: window-level rules. No binds, outputs, globals or layer rules.
+// Ported from ~/.config/hypr/hyprland.lua ("WINDOW RULES" section), which is
+// the single source of truth for every value repeated below.
+//
+// Rule order matters in niri: earlier rules are applied first, later rules
+// override them. Generic rules therefore sit at the top and per-app overrides
+// below.
+//
+// Hyprland grouped apps with tags (tag = "+browser") and then attached
+// properties to the tag. niri has no tags or tag inheritance, so each tag's
+// matcher is repeated once per property. The regexes are byte-identical to
+// hyprland.lua so the two stay easy to diff.
+// ---------------------------------------------------------------------------
+
+// ===========================================================================
+// 1. Global window appearance (decoration.* in Hyprland)
+// ===========================================================================
+
+// decoration.rounding = 10; blur on, xray off; no border behind transparent
+// windows.
+window-rule {
+    geometry-corner-radius 10
+    clip-to-geometry true
+    background-effect {
+        blur true
+        xray false
+    }
+    draw-border-with-background false
+}
+
+// decoration.inactive_opacity = 0.9. Placed before the per-app rules so those
+// can override it.
+window-rule {
+    match is-active=false
+    opacity 0.9
+}
+
+// ===========================================================================
+// 2. Per-app opacity
+//    Hyprland: opacity = "active inactive". niri needs one rule per state.
+//    Tag `settings` had no properties in hyprland.lua, so it has no rule here.
+// ===========================================================================
+
+// browser      active 0.99 / inactive 0.8
+window-rule {
+    match app-id=r#"^([Ff]irefox|org[.]mozilla[.]firefox|[Ff]irefox-esr|[Ff]irefox-bin|[Gg]oogle-chrome.*|[Cc]hromium|[Mm]icrosoft-edge.*|[Bb]rave-browser.*|[Tt]horium-browser|[Cc]achy-browser|zen.*)$"# is-active=true
+    opacity 0.99
+}
+window-rule {
+    match app-id=r#"^([Ff]irefox|org[.]mozilla[.]firefox|[Ff]irefox-esr|[Ff]irefox-bin|[Gg]oogle-chrome.*|[Cc]hromium|[Mm]icrosoft-edge.*|[Bb]rave-browser.*|[Tt]horium-browser|[Cc]achy-browser|zen.*)$"# is-active=false
+    opacity 0.8
+}
+
+// terminal     active 0.9 / inactive 0.7
+window-rule {
+    match app-id=r#"^(ghostty|wezterm|Alacritty|kitty|kitty-dropterm)$"# is-active=true
+    opacity 0.9
+}
+window-rule {
+    match app-id=r#"^(ghostty|wezterm|Alacritty|kitty|kitty-dropterm)$"# is-active=false
+    opacity 0.7
+}
+
+// projects     active 0.98 / inactive 0.85
+window-rule {
+    match app-id=r#"^(codium.*|VSCodium|VSCode|code.*|jetbrains-.*|dev[.]zed[.]Zed|antigravity)$"# is-active=true
+    opacity 0.98
+}
+window-rule {
+    match app-id=r#"^(codium.*|VSCodium|VSCode|code.*|jetbrains-.*|dev[.]zed[.]Zed|antigravity)$"# is-active=false
+    opacity 0.85
+}
+
+// im           active 0.95 / inactive 0.8
+window-rule {
+    match app-id=r#"^([Dd]iscord|[Ww]ebCord|[Vv]esktop|[Ff]erdium|[Ww]hatsapp.*|ZapZap|org[.]telegram[.]desktop|teams-for-linux|Element)$"# is-active=true
+    opacity 0.95
+}
+window-rule {
+    match app-id=r#"^([Dd]iscord|[Ww]ebCord|[Vv]esktop|[Ff]erdium|[Ww]hatsapp.*|ZapZap|org[.]telegram[.]desktop|teams-for-linux|Element)$"# is-active=false
+    opacity 0.8
+}
+
+// multimedia   active 0.94 / inactive 0.86
+window-rule {
+    match app-id=r#"^([Aa]udacious|[Mm]pv|vlc|com[.]github[.]rafostar[.]Clapper)$"# is-active=true
+    opacity 0.94
+}
+window-rule {
+    match app-id=r#"^([Aa]udacious|[Mm]pv|vlc|com[.]github[.]rafostar[.]Clapper)$"# is-active=false
+    opacity 0.86
+}
+
+// file-manager active 0.9 / inactive 0.8
+window-rule {
+    match app-id=r#"^([Tt]hunar|org[.]gnome[.]Nautilus|[Pp]cmanfm-qt|app[.]drey[.]Warp)$"# is-active=true
+    opacity 0.9
+}
+window-rule {
+    match app-id=r#"^([Tt]hunar|org[.]gnome[.]Nautilus|[Pp]cmanfm-qt|app[.]drey[.]Warp)$"# is-active=false
+    opacity 0.8
+}
+
+// ===========================================================================
+// 3. Refresh rate (Hyprland misc.vrr = 2, fullscreen-only approximation)
+//    Closest niri form: on-demand VRR while a video window is visible. It
+//    cannot be restricted to fullscreen (see gap at bottom).
+// ===========================================================================
+
+window-rule {
+    match app-id=r#"^([Aa]udacious|[Mm]pv|vlc|com[.]github[.]rafostar[.]Clapper)$"#
+    variable-refresh-rate true
+}
+
+// ===========================================================================
+// 4. Floating windows and dialogs
+// ===========================================================================
+
+// Picture-in-Picture: float. Hyprland also pinned it and kept aspect ratio;
+// niri floating windows do not scroll, which covers "pin", and offers no
+// keep-aspect-ratio knob.
+window-rule {
+    match title="^[Pp]icture-in-[Pp]icture$"
+    open-floating true
+}
+
+// Authentication dialogs: float. niri centres new floating windows by default,
+// replacing Hyprland's center = true.
+window-rule {
+    match title="^(Authentication Required|Authentication required)$"
+    open-floating true
+}
+
+// Common file dialogs: float.
+window-rule {
+    match title="^(Open Files|Save As|Add Folder to Workspace)$"
+    open-floating true
+}
+
+// Standalone media windows: float.
+window-rule {
+    match app-id=r#"^(mpv|com[.]github[.]rafostar[.]Clapper|[Qq]alculate-gtk)$"#
+    open-floating true
+}
+
+// Volume mixer: float.
+window-rule {
+    match app-id=r#"^(pavucontrol|org[.]pulseaudio[.]pavucontrol|com[.]saivert[.]pwvucontrol)$"#
+    open-floating true
+}
+
+// WezTerm initial-configure workaround, copied from niri's default config.
+window-rule {
+    match app-id=r#"^org[.]wezfurlong[.]wezterm$"#
+    default-column-width {}
+}
+
+// ===========================================================================
+// 5. Dropdown terminal (replaces the Hyprland special:scratchpad workspace)
+//    65% x 65%, 10% from the top, horizontally centred.
+//    niri has no percentage offset, so y is fixed: 120 px is 10% of the
+//    1200 px logical height of the internal panel (owned by conf/outputs.kdl,
+//    restated here only as a comment). On a 1440 px-high output it is ~8.3%.
+//    The spawn/toggle logic lives in scripts/dropdown.sh.
+//    If this niri build ignores `proportion` for floating windows, replace the
+//    two size lines with `fixed 1248` / `fixed 780` (65% of 1920x1200 logical).
+// ===========================================================================
+
+window-rule {
+    match app-id=r#"^kitty-dropterm$"#
+    open-floating true
+    default-column-width { proportion 0.65; }
+    default-window-height { proportion 0.65; }
+    default-floating-position x=0 y=120 relative-to="top"
+}
+
+// ===========================================================================
+// 6. Not portable to niri (kept here so nothing is silently dropped)
+//
+// From hyprland.lua WINDOW RULES:
+//   suppress_event = "maximize"  (match class ".*")
+//       No niri equivalent.
+//   fix-xwayland-drags (class "^$", title "^$", xwayland true, float true,
+//       no_focus true)
+//       No xwayland matcher, and no no-focus rule property.
+//   pin = true                   Floating windows do not scroll; closest is
+//                                covered by open-floating.
+//   keep_aspect_ratio = true     No niri rule property.
+//   center = true                Native default for new floating windows.
+//   idle_inhibit = "fullscreen"  niri 26.04 has no idle-inhibit window rule
+//                                and no compositor-side substitute. Apps that
+//                                honour zwp_idle_inhibit (mpv, browsers while
+//                                playing) still stop the idle timer; for
+//                                anything else use the bar's idle_inhibitor
+//                                button or `systemd-inhibit`.
+//   Hyprland tag `settings`      Carried no properties, so nothing to port.
+//   Hyprland tags in general     No tag inheritance; expanded per app above.
+//
+// Not a window rule, listed for completeness: hyprland.lua's
+//   workspace_rule("special:special", gaps_out = 120/192)
+// is a workspace rule. Its niri home is the named workspace "scratch" declared
+// in conf/binds/workspaces.kdl (niri has no overlay/scratchpad workspace, so
+// it is a plain workspace, not a dropdown).
+//
+// ===========================================================================

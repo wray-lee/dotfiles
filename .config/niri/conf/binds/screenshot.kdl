@@ -1,0 +1,21 @@
+// Screenshots. All paths go through scripts/screenshot.sh so every shot is
+// saved with the same name pattern and gets the Open/Delete notification,
+// matching Hyprland's ScreenShot.sh.
+binds {
+    Mod+Print repeat=false hotkey-overlay-title="Screenshot screen" { spawn-sh "$HOME/.config/niri/scripts/screenshot.sh --now"; }
+    Mod+Shift+S repeat=false hotkey-overlay-title="Screenshot area" { spawn-sh "$HOME/.config/niri/scripts/screenshot.sh --area"; }
+    // Laptops.conf fallbacks for laptops without a Print key
+    Mod+F6 repeat=false hotkey-overlay-title="Screenshot screen" { spawn-sh "$HOME/.config/niri/scripts/screenshot.sh --now"; }
+    Mod+Shift+F6 repeat=false hotkey-overlay-title="Screenshot area" { spawn-sh "$HOME/.config/niri/scripts/screenshot.sh --area"; }
+    Alt+F6 repeat=false hotkey-overlay-title="Screenshot active window" { spawn-sh "$HOME/.config/niri/scripts/screenshot.sh --win"; }
+    Mod+Ctrl+F6 repeat=false hotkey-overlay-title="Screenshot in 5 seconds" { spawn-sh "$HOME/.config/niri/scripts/screenshot.sh --in5"; }
+    Mod+Alt+F6 repeat=false hotkey-overlay-title="Screenshot in 10 seconds" { spawn-sh "$HOME/.config/niri/scripts/screenshot.sh --in10"; }
+}
+
+// ---------------------------------------------------------------------------
+// Gap vs Hyprland: Hyprland could pipe a region straight into an editor. niri
+// has no pipe action; scripts/screenshot.sh --swappy covers annotate-then-save
+// and --ui opens niri's own screenshot UI. The save directory is owned by
+// conf/misc.kdl (screenshot-path); screenshot.sh derives the same directory in
+// scripts/lib/common.sh (KDL cannot be read by scripts).
+// ---------------------------------------------------------------------------

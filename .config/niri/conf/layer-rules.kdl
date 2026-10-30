@@ -1,0 +1,50 @@
+// conf/layer-rules.kdl
+// ---------------------------------------------------------------------------
+// ONE concern: layer-shell rules. Window rules live in conf/window-rules.kdl.
+// Ported from ~/.config/hypr/hyprland.lua ("LAYER RULES" section).
+//
+// Hyprland applied `blur = true` to four namespaces. niri's equivalent is
+// background-effect { blur true }. Namespaces are anchored so a bar called
+// e.g. "waybar-extra" does not pick up the rule by accident.
+// ---------------------------------------------------------------------------
+
+// launcher
+layer-rule {
+    match namespace="^rofi$"
+    background-effect {
+        blur true
+    }
+}
+
+// notification centre
+layer-rule {
+    match namespace="^swaync-control-center$"
+    background-effect {
+        blur true
+    }
+}
+
+// notification popups
+layer-rule {
+    match namespace="^swaync-notification-window$"
+    background-effect {
+        blur true
+    }
+}
+
+// status bar
+layer-rule {
+    match namespace="^waybar$"
+    background-effect {
+        blur true
+    }
+}
+
+// ===========================================================================
+// Not portable to niri (kept here so nothing is silently dropped)
+//
+// From hyprland.lua LAYER RULES:
+//   ignore_alpha = 0   No niri layer-rule property; no equivalent knob.
+//                      niri blurs the surface as-is. There is no per-layer
+//                      alpha cutoff to disable.
+// ===========================================================================
