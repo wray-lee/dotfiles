@@ -1,0 +1,6 @@
+# Fallback for apps without XCURSOR_THEME (e.g. XWayland). nwg-look rewrites
+# this file when a cursor is picked there.
+[Icon Theme]
+Name=Default
+Comment=Default Cursor Theme
+Inherits=Bibata-Modern-Ice

@@ -20,9 +20,9 @@ input {
         dwt
         natural-scroll
         scroll-method "two-finger"
-        // Prevents the palm/touchpad from fighting a real mouse on the new
-        // laptop (replaces the manual Hyprland touchpad toggle for this case).
-        disabled-on-external-mouse
+        // No disabled-on-external-mouse: the H3C keyboard cover exposes a
+        // "USB KeyBoard Mouse" node next to its touchpad, so niri would count
+        // it as an external mouse and switch the touchpad off.
         // niri's default; stated explicitly for parity with the Hyprland setup.
         accel-profile "adaptive"
     }

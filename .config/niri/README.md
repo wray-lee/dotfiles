@@ -188,10 +188,21 @@ too). xwayland-satellite is started on demand by niri.
   panel differently, `niri msg outputs` will show it; update both
   `conf/outputs.kdl` and the `touch { map-to-output }` line. A wrong name is
   ignored (touch falls back to the union of outputs).
-- On-screen keyboard and display rotation are **not ported**: no keyboard app is
-  installed, `misc.kdl` does not bind `tablet-mode-*`, and there is no rotate
-  script. The comments in `conf/misc.kdl` show the two lines needed if
-  squeekboard is installed.
+- On-screen keyboard: `scripts/osk.sh show|hide|toggle` drives squeekboard over
+  D-Bus (fcitx5 holds input-method-v2, so it never pops up on text focus). The
+  laptop has no tablet-mode switch, so `udev/90-osk-keyboard-cover.rules` shows
+  it when the keyboard cover is detached and hides it when attached; the waybar
+  `custom/osk` button toggles it by touch. The rule must be installed into
+  `/etc/udev/rules.d/` (command in the file). Display rotation is **not ported**.
+- Window widths: niri has no "fill when alone" option, so `scripts/autofill.sh`
+  follows the IPC event stream and, when a workspace's tiled column count
+  changes, sets 1 column to 100% and 2 columns to 50% each (3+ scroll as usual).
+  It only acts on a count change, so manual resizes stick.
+- Touchscreen gestures: niri has no configurable touch gestures, so
+  `scripts/gestures.sh` runs lisgd (AUR) with its own gesture table (3 fingers
+  up/down = keyboard show/hide, 3 left/right = columns, 4 up = overview, edge
+  swipes = notifications / launcher). It needs
+  `udev/70-touchscreen-uaccess.rules` installed to read the touchscreen.
 - The dropdown's y-offset is fixed at 120 px (10% of the internal panel's
   1200 px logical height); on a different-height panel it is approximate.
 - `hyprlock` v0.9.6 ignores the inherited `grace` option, so it was removed

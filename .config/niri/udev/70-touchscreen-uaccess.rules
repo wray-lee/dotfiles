@@ -1,0 +1,5 @@
+# Let the logged-in seat user read touchscreen evdev nodes, so scripts/gestures.sh
+# (lisgd) works without adding the user to the "input" group, which would expose
+# every keyboard too. Must sort before 73-seat-late.rules, where uaccess applies.
+# Install: sudo install -m644 ~/.config/niri/udev/70-touchscreen-uaccess.rules /etc/udev/rules.d/
+SUBSYSTEM=="input", KERNEL=="event*", ENV{ID_INPUT_TOUCHSCREEN}=="1", TAG+="uaccess"

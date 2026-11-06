@@ -1,0 +1,96 @@
+//* ---- niri overrides for shared KooL custom modules ---- *//
+/* Must be included BEFORE Modules/ModulesCustom (waybar: first value wins). */
+/* Only changed hooks are listed; format/tooltip/icons still come from the
+   original definitions via waybar's recursive include merge.
+   Every exec/on-click that would touch ~/.config/hypr is redefined here with
+   a niri-owned command, so the bar never runs Hyprland scripts. */
+
+{
+"backlight": {
+	"on-scroll-up": "$HOME/.config/niri/scripts/brightness.sh --inc",
+	"on-scroll-down": "$HOME/.config/niri/scripts/brightness.sh --dec"
+},
+
+"battery": {
+	"on-click-middle": "niri msg action toggle-window-rule-opacity",
+	"on-click-right": "$HOME/.config/niri/scripts/wlogout.sh"
+},
+
+"pulseaudio": {
+	"on-click": "$HOME/.config/niri/scripts/volume.sh --toggle",
+	"on-scroll-up": "$HOME/.config/niri/scripts/volume.sh --inc",
+	"on-scroll-down": "$HOME/.config/niri/scripts/volume.sh --dec"
+},
+
+"pulseaudio#microphone": {
+	"on-click": "$HOME/.config/niri/scripts/volume.sh --toggle-mic",
+	"on-scroll-up": "$HOME/.config/niri/scripts/volume.sh --mic-inc",
+	"on-scroll-down": "$HOME/.config/niri/scripts/volume.sh --mic-dec"
+},
+
+"custom/playerctl": {
+	"on-scroll-up": "$HOME/.config/niri/scripts/volume.sh --inc",
+	"on-scroll-down": "$HOME/.config/niri/scripts/volume.sh --dec"
+},
+
+"custom/power": {
+	"on-click": "$HOME/.config/niri/scripts/wlogout.sh",
+	"on-click-right": "niri msg action toggle-window-rule-opacity"
+},
+
+"custom/lock": {
+	"on-click": "$HOME/.config/niri/scripts/lock.sh"
+},
+
+"custom/weather": {
+	"exec": "$HOME/.config/niri/scripts/weather.py"
+},
+
+"custom/cava_mviz": {
+	"exec": "$HOME/.config/niri/scripts/cava.sh"
+},
+
+"custom/settings": {
+	"on-click": "swaync-client -t -sw",
+	"tooltip-format": "Open the notification centre"
+},
+
+"custom/cycle_wall": {
+	"on-click": "$HOME/.config/niri/scripts/wallpaper-select.sh",
+	"on-click-right": "$HOME/.config/niri/scripts/wallpaper-random.sh",
+	"on-click-middle": "$HOME/.config/niri/scripts/waybar-niri.sh --style"
+},
+
+"custom/light_dark": {
+	"on-click": "$HOME/.config/niri/scripts/theme-select.sh",
+	"on-click-middle": "$HOME/.config/niri/scripts/wallpaper-select.sh",
+	"on-click-right": "$HOME/.config/niri/scripts/waybar-niri.sh --style",
+	"tooltip-format": "Left Click: Wallust theme\nMiddle Click: Wallpaper Menu\nRight Click: Waybar Styles Menu"
+},
+
+"custom/menu": {
+	"on-click-middle": "$HOME/.config/niri/scripts/wallpaper-select.sh",
+	"on-click-right": "$HOME/.config/niri/scripts/waybar-niri.sh --layout"
+},
+
+"custom/hint": {
+	"on-click": "niri msg action show-hotkey-overlay",
+	"on-click-right": "niri msg action show-hotkey-overlay",
+	"tooltip-format": "Key bindings overlay (niri native)"
+},
+
+// No niri equivalent for the KooL dotfiles updater: hide the module.
+"custom/dot_update": {
+	"format": "",
+	"exec": "true",
+	"on-click": ""
+},
+
+// Not instantiated by configs/[TOP] Niri Laptop (the bar uses the native
+// idle_inhibitor); neutralised so it can never run ~/.config/hypr scripts.
+"custom/hypridle": {
+	"exec": "true",
+	"on-click": "",
+	"on-click-right": "$HOME/.config/niri/scripts/lock.sh"
+},
+}

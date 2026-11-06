@@ -6,6 +6,10 @@
 // into systemd and D-Bus, so dbus-update-activation-environment is not needed.
 
 // Authentication dialogs first, so the session can prompt as soon as it starts.
+// The spawn below did not survive the first login on the MegaBook, so the
+// packaged unit is the primary path (restarts on failure, tied to
+// graphical-session.target): systemctl --user enable hyprpolkitagent.service
+// polkit.sh then sees the running agent and exits.
 spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/polkit.sh\""
 
 // Wallpaper: starts awww-daemon and restores the last image on every output.
@@ -25,6 +29,12 @@ spawn-at-startup "sh" "-c" "exec hypridle -c \"$HOME/.config/niri/idle/hypridle.
 // Pre-warm the dropdown terminal on the hidden "scratch" workspace, like
 // Hyprland's exec-once Dropterminal.sh (first Mod+Shift+Return is instant).
 spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/dropdown.sh\" --prewarm"
+
+// Hyprland-like widths: a lone column fills the output, two split 50/50.
+spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/autofill.sh\""
+
+// Touchscreen gestures (lisgd); the gesture table lives in the script.
+spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/gestures.sh\""
 
 // Input method.
 spawn-at-startup "fcitx5" "-d"

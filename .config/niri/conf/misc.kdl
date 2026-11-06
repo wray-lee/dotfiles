@@ -2,10 +2,12 @@
 // ONE concern: compositor-wide toggles that are not input, output, layout,
 // animation or startup settings.
 
-// Client-side decorations are left to clients, matching Hyprland (Firefox and
-// other CSD apps keep their own titlebars). prefer-no-csd is deliberately NOT
-// set: it would ask clients to drop CSD and let niri draw server-side
-// decorations, a visible change from the Hyprland session.
+// Hyprland answers xdg-decoration with "server side" and then draws no
+// titlebar, so kitty & co. show none there. Without this niri tells them to
+// draw their own (kitty's grey titlebar with buttons). niri draws no titlebar
+// either, only the focus ring/border. Apps without xdg-decoration (Firefox's
+// tab strip) are unaffected, as on Hyprland.
+prefer-no-csd
 
 // niri's own screenshot action (bound in conf/binds/screenshot.kdl) saves here;
 // the same directory the Hyprland screenshots used.
@@ -73,8 +75,7 @@ switch-events {
     }
 }
 
-// tablet-mode switch events (tablet-mode-on/off) are intentionally not bound:
-// no on-screen keyboard is installed in this setup (Hyprland had none either).
-// To add one, install squeekboard and bind:
-//     tablet-mode-on  { spawn "sh" "-c" "pgrep -x squeekboard || exec squeekboard"; }
-//     tablet-mode-off { spawn "sh" "-c" "pkill -x squeekboard"; }
+// No tablet-mode-on/off binds: this laptop has no SW_TABLET_MODE switch. The
+// on-screen keyboard follows the keyboard cover instead (udev/
+// 90-osk-keyboard-cover.rules -> scripts/osk.sh) plus the waybar custom/osk
+// button.

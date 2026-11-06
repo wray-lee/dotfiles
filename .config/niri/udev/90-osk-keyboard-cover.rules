@@ -1,0 +1,8 @@
+# H3C MegaBook 14 keyboard cover (USB 1c4f:0086, "HS-LP88"). The machine has no
+# SW_TABLET_MODE switch, so cover detached = tablet mode: show the on-screen
+# keyboard; cover attached = hide it. Runs scripts/osk.sh in wray's session.
+# Install: sudo install -m644 ~/.config/niri/udev/90-osk-keyboard-cover.rules /etc/udev/rules.d/
+ACTION=="remove", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{PRODUCT}=="1c4f/86/*", \
+  RUN+="/usr/bin/systemd-run --machine=wray@.host --user --no-block --quiet /usr/bin/bash /home/wray/.config/niri/scripts/osk.sh show"
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ENV{PRODUCT}=="1c4f/86/*", \
+  RUN+="/usr/bin/systemd-run --machine=wray@.host --user --no-block --quiet /usr/bin/bash /home/wray/.config/niri/scripts/osk.sh hide"

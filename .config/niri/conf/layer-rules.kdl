@@ -32,11 +32,14 @@ layer-rule {
     }
 }
 
-// status bar
+// status bar: no blur. Hyprland's waybar-blur rule has ignore_alpha = 0, so the
+// fully transparent gaps between modules stay clear there. niri blurs the whole
+// layer rectangle (no alpha cutoff, and waybar sends no ext-background-effect
+// shape), which fogs the gaps. Clear gaps matter more than blurred pills.
 layer-rule {
     match namespace="^waybar$"
     background-effect {
-        blur true
+        blur false
     }
 }
 
@@ -46,5 +49,6 @@ layer-rule {
 // From hyprland.lua LAYER RULES:
 //   ignore_alpha = 0   No niri layer-rule property; no equivalent knob.
 //                      niri blurs the surface as-is. There is no per-layer
-//                      alpha cutoff to disable.
+//                      alpha cutoff to disable. For waybar this is why its
+//                      blur is off (see the status bar rule above).
 // ===========================================================================

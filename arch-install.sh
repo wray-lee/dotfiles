@@ -261,6 +261,17 @@ EOF
 # passwords via chpasswd on stdin, never written to disk
 printf 'root:%s\n%s:%s\n' "$ROOT_PW" "$USER" "$USER_PW" | arch-chroot /mnt chpasswd
 
+# ---------- yay + AUR themes (icons/cursor are too big for the dotfiles repo) ----------
+# makepkg refuses root, so build as the user with a temporary NOPASSWD rule;
+# "zz-" sorts after sudoers.d/wheel, otherwise wheel's password rule wins
+printf '%s ALL=(ALL) NOPASSWD: ALL\n' "$USER" >/mnt/etc/sudoers.d/zz-install
+arch-chroot /mnt sudo -u "$USER" bash -e <<'EOF' || echo "!! yay/AUR step failed, rerun it after first boot" >&2
+cd /tmp && rm -rf yay-bin && git clone --depth 1 https://aur.archlinux.org/yay-bin.git
+(cd yay-bin && makepkg -si --noconfirm) && rm -rf yay-bin
+yay -S --noconfirm --needed --answerdiff None --answerclean None flat-remix bibata-cursor-theme-bin
+EOF
+rm -f /mnt/etc/sudoers.d/zz-install
+
 umount -R /mnt
 swapoff -a
 

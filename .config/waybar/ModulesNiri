@@ -1,0 +1,62 @@
+//* ---- niri compositor modules (waybar 0.15.0) ---- *//
+/* Definitions only. Instantiated by configs/[TOP] Niri Laptop. */
+
+{
+// niri has dynamic, per-output workspaces. No window-rewrite / persistent-workspaces
+// in waybar 0.15.0 (see spec-waybar.md G1/G2/G3).
+"niri/workspaces": {
+	"format": "{icon}",
+	"all-outputs": true,
+	"format-icons": {
+		"focused": "",
+		"active": "",
+		"urgent": "",
+		"empty": "",
+		"default": ""
+	}
+},
+
+// Closest match to Modules:190 (hyprland/window). waybar 0.15's niri/window
+// supports `rewrite` and `separate-outputs` (waybar-niri-window(5)); only
+// max-length/offscreen-css are missing.
+"niri/window": {
+	"format": "{title}",
+	"separate-outputs": true,
+	"rewrite": {
+		"(.*) — Mozilla Firefox": " $1",
+		"(.*) - fish": "> [$1]",
+		"(.*) - zsh": "> [$1]"
+	}
+},
+
+// Replaces hyprland/language and the broken custom/keyboard.
+"niri/language": {
+	"format": "Lang: {}",
+	"format-en": "US",
+	"format-tr": "Korea"
+},
+
+// niri twin of ModulesGroups' group/status: niri/language instead of custom/keyboard.
+"group/status_niri": {
+	"orientation": "inherit",
+	"drawer": {
+		"transition-duration": 500,
+		"children-class": "custom/power",
+		"transition-left-to-right": false
+	},
+	"modules": [
+		"custom/power",
+		"custom/lock",
+		"keyboard-state",
+		"niri/language"
+	]
+},
+
+// On-screen keyboard toggle for touch use (scripts/osk.sh). No tablet-mode
+// switch on this laptop, so this is the manual path next to the udev rule.
+"custom/osk": {
+	"format": "󰌌",
+	"tooltip-format": "On-screen keyboard",
+	"on-click": "$HOME/.config/niri/scripts/osk.sh toggle"
+},
+}
