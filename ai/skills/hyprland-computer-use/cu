@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+# Linux (Wayland/Hyprland) computer-use helper: screenshot + synthetic input.
+# Coordinates are always logical pixels of the focused monitor, i.e. exactly what `shot` produces.
+set -euo pipefail
+
+RT="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"; export XDG_RUNTIME_DIR="$RT"
+export YDOTOOL_SOCKET="${YDOTOOL_SOCKET:-$RT/.ydotool_socket}"
+OUT_DIR="${CU_DIR:-/tmp/cu}"; mkdir -p "$OUT_DIR"
+HDR=/usr/include/linux/input-event-codes.h
+FIFO="$RT/cu-pointer.fifo"
+SELF_DIR="$(dirname "$(readlink -f "$0")")"
+
+die() { echo "cu: $*" >&2; exit 1; }
+need() { command -v "$1" >/dev/null || die "missing command: $1"; }
+
+# ssh and cron shells have no compositor env: find it
+if [ -z "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]; then
+  HYPRLAND_INSTANCE_SIGNATURE=$(ls -t "$RT/hypr" 2>/dev/null | head -n1 || true)
+  [ -n "$HYPRLAND_INSTANCE_SIGNATURE" ] && export HYPRLAND_INSTANCE_SIGNATURE
+fi
+if [ -z "${WAYLAND_DISPLAY:-}" ]; then
+  WAYLAND_DISPLAY=$(ls "$RT" 2>/dev/null | grep -E '^wayland-[0-9]+$' | head -n1 || true)
+  [ -n "$WAYLAND_DISPLAY" ] && export WAYLAND_DISPLAY
+fi
+
+# "name logical_w logical_h layout_x layout_y" of the focused monitor.
+# Odd transform (1,3,5,7) = rotated 90deg: hyprctl reports the unrotated mode, so swap.
+focused() {
+  hyprctl -j monitors | jq -r '.[] | select(.focused) |
+    (if (.transform % 2) == 1 then [.height, .width] else [.width, .height] end) as $s |
+    "\(.name) \($s[0] / .scale | floor) \($s[1] / .scale | floor) \(.x) \(.y)"'
+}
+
+keycode() { # name -> linux key code
+  local n="${1,,}"
+  case "$n" in
+    ctrl) n=leftctrl;; shift) n=leftshift;; alt) n=leftalt;; super|meta|win) n=leftmeta;;
+    enter|return) n=enter;; esc|escape) n=esc;; del) n=delete;; pgup) n=pageup;; pgdn) n=pagedown;;
+  esac
+  local v
+  v=$(grep -E "^#define KEY_${n^^}[[:space:]]" "$HDR" | awk '{print $3}' | head -n1)
+  [ -n "$v" ] || die "unknown key: $1"
+  echo $((v))
+}
+
+press() { # "ctrl+shift+t" -> down in order, up in reverse
+  local codes=() down=() up=() k c
+  IFS='+' read -ra parts <<<"$1"
+  for k in "${parts[@]}"; do codes+=("$(keycode "$k")"); done
+  for c in "${codes[@]}"; do down+=("$c:1"); done
+  for ((i=${#codes[@]}-1; i>=0; i--)); do up+=("${codes[i]}:0"); done
+  ydotool key "${down[@]}" "${up[@]}"
+}
+
+# send one line to the pointer daemon, starting it on first use
+ptr() {
+  if ! { [ -p "$FIFO" ] && pgrep -u "$(id -u)" -f "pointer.py $FIFO" >/dev/null; }; then
+    rm -f "$FIFO"; mkfifo "$FIFO"
+    setsid python3 -I "$SELF_DIR/pointer.py" "$FIFO" >"$OUT_DIR/pointer.log" 2>&1 </dev/null &
+    sleep 1.5
+  fi
+  echo "$*" >"$FIFO"
+}
+
+moveto() { # x y in logical px of the focused monitor -> 0..32767 absolute axis
+  local x=$1 y=$2 name w h
+  # shortcut: single-monitor layout only (device spans the whole layout box), extend when a second monitor is used
+  read -r name w h _ <<<"$(focused)"
+  ptr m $(( x * 32767 / (w - 1) )) $(( y * 32767 / (h - 1) ))
+}
+
+# real pointer position in logical px of the focused monitor (hyprctl reports layout coords)
+pos() {
+  local name w h ox oy cx cy
+  read -r name w h ox oy <<<"$(focused)"
+  IFS=', ' read -r cx cy <<<"$(hyprctl cursorpos)"
+  echo "$(( cx - ox )) $(( cy - oy ))"
+}
+
+cmd="${1:-help}"; shift || true
+case "$cmd" in
+  doctor)
+    rc=0
+    for c in grim ydotool wl-copy hyprctl jq python3; do command -v $c >/dev/null && echo "ok   $c" || { echo "FAIL $c not installed"; rc=1; }; done
+    [ -r "$HDR" ] && echo "ok   $HDR" || { echo "FAIL $HDR missing (key names)"; rc=1; }
+    [ -w /dev/uinput ] && echo "ok   /dev/uinput writable" || { echo "FAIL /dev/uinput not writable: add user to group 'input' and re-login"; rc=1; }
+    [ -S "$YDOTOOL_SOCKET" ] && echo "ok   ydotoold socket $YDOTOOL_SOCKET (keyboard)" || { echo "FAIL ydotoold not running: systemctl --user enable --now ydotool"; rc=1; }
+    if hyprctl -j monitors >/dev/null 2>&1; then
+      echo "ok   hyprland $HYPRLAND_INSTANCE_SIGNATURE, focused monitor: $(focused)"
+      hyprctl -j monitors | jq -e 'all(.[]; .dpmsStatus)' >/dev/null || { echo "FAIL a monitor is asleep (dpms off): grim cannot capture it. Wake it, e.g. move the real mouse"; rc=1; }
+    else echo "FAIL cannot talk to hyprctl (HYPRLAND_INSTANCE_SIGNATURE=${HYPRLAND_INSTANCE_SIGNATURE:-unset})"; rc=1; fi
+    exit $rc;;
+  shot) # cu shot [path]  -> prints file path; open it with the Read tool
+    need grim; mkdir -p "$OUT_DIR"
+    f="${1:-$OUT_DIR/shot-$(date +%H%M%S).png}"
+    read -r name _ <<<"$(focused)"
+    # -s 1: logical pixels; -c: draw cursor; timeout: grim blocks forever on a sleeping monitor
+    timeout 15 grim -s 1 -c -o "$name" "$f" || die "grim failed or timed out (monitor asleep? run: cu doctor)"
+    echo "$f";;
+  move)  moveto "$1" "$2";;
+  pos)   pos;;
+  click) # cu click x y [left|right|middle|double]
+    moveto "$1" "$2"; sleep 0.05
+    case "${3:-left}" in
+      left) ptr d 272; ptr u 272;; right) ptr d 273; ptr u 273;; middle) ptr d 274; ptr u 274;;
+      double) ptr d 272; ptr u 272; sleep 0.08; ptr d 272; ptr u 272;;
+      *) die "button: left|right|middle|double";;
+    esac;;
+  drag) # cu drag x1 y1 x2 y2
+    moveto "$1" "$2"; sleep 0.05; ptr d 272; sleep 0.1
+    moveto "$3" "$4"; sleep 0.1; ptr u 272;;
+  scroll) # cu scroll up|down [notches]
+    n="${2:-3}"; [ "$1" = up ] && d=1 || d=-1
+    ptr w $((d * n));;
+  type) # paste via clipboard: works for any language; terminals need `cu key ctrl+shift+v` instead
+    need wl-copy; prev=$(wl-paste -n 2>/dev/null || true)
+    printf '%s' "$1" | wl-copy
+    sleep 0.05; press "${2:-ctrl+v}"; sleep 0.15
+    printf '%s' "$prev" | wl-copy;;
+  key) press "$1";;
+  windows) hyprctl -j clients | jq -r '(.[] | select(.mapped)) | "\(.address)\t\(if .focusHistoryID == 0 then "*" else " " end)\t\(.class)\t\(.title)"';;
+  focus) # cu focus ADDRESS   (hyprland 0.5x+ uses lua dispatchers; fall back to the classic syntax)
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$1\" })" 2>&1 | grep -qi '^ok' \
+      || hyprctl dispatch focuswindow "address:$1";;
+  calibrate) # move to 4 points and compare with hyprctl's real cursor position: prints PASS or FAIL
+    read -r _ w h _ <<<"$(focused)"; bad=0
+    for p in "$((w/10)) $((h/10))" "$((w/2)) $((h/2))" "$((w*9/10)) $((h/10))" "$((w*9/10)) $((h*9/10))"; do
+      read -r x y <<<"$p"; moveto "$x" "$y"; sleep 0.25; read -r ax ay <<<"$(pos)"
+      dx=$((ax - x)); dy=$((ay - y)); [ ${dx#-} -le 2 ] && [ ${dy#-} -le 2 ] && r=ok || { r=BAD; bad=1; }
+      echo "$r  want $x,$y got $ax,$ay"
+    done
+    [ $bad = 0 ] && echo "calibrate: PASS" || { echo "calibrate: FAIL"; exit 1; };;
+  *)
+    cat <<EOF
+cu doctor | calibrate | shot [path] | pos | move x y | click x y [left|right|middle|double] | drag x1 y1 x2 y2
+   | scroll up|down [n] | type "text" [paste-combo] | key ctrl+shift+t | windows | focus ADDRESS
+EOF
+    ;;
+esac
