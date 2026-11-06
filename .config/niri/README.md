@@ -96,6 +96,7 @@ niri validate -c ~/.config/niri/config.kdl   # must print: config is valid
 | `scripts/brightness.sh`, `scripts/brightness-kbd.sh` | Panel and keyboard backlight. |
 | `scripts/nightlight.sh` | wlsunset/gammastep blue-light filter with saved state. |
 | `scripts/airplane.sh` | Toggle airplane mode. |
+| `scripts/refresh-rate.sh` | Panel refresh rate follows the power profile (power-saver 60 Hz, otherwise 120 Hz). |
 | `scripts/kill-window.sh` | Kill the focused process. |
 | `scripts/lid.sh` | Lid policy from `switch-events` (panel off behind an external). |
 | `scripts/clipmanager.sh` | cliphist + rofi clipboard history. |

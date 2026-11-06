@@ -1,0 +1,6 @@
+[Desktop Entry]
+# niri's startup.kdl starts fcitx5 itself, so it inherits niri's environment { };
+# this hides the packaged XDG autostart entry that niri-session would also run.
+Type=Application
+Name=Fcitx 5
+Hidden=true

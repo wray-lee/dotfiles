@@ -33,10 +33,15 @@ spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/dropdown.sh\"
 // Hyprland-like widths: a lone column fills the output, two split 50/50.
 spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/autofill.sh\""
 
+// Panel refresh rate follows the power profile (power-saver = 60 Hz).
+spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/refresh-rate.sh\""
+
 // Touchscreen gestures (lisgd); the gesture table lives in the script.
 spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/gestures.sh\""
 
-// Input method.
+// Input method. Started here, not by XDG autostart, so it inherits the
+// environment { } above; ~/.config/autostart/org.fcitx.Fcitx5.desktop hides
+// the packaged autostart entry so only one copy runs.
 spawn-at-startup "fcitx5" "-d"
 
 // Clipboard history: one watcher per mime type, both feeding `cliphist store`.
