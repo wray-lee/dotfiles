@@ -134,10 +134,10 @@ case "$OS" in
 esac
 
 case "$OS" in
-    arch)          EXTRAS="fastfetch docker nginx ranger bat tldr lsd duf zoxide fd btop nmap fzf" ;;
-    debian|ubuntu) EXTRAS="fastfetch docker.io nginx ranger bat tldr lsd duf zoxide fd-find btop nmap fzf" ;;
-    fedora)        EXTRAS="fastfetch moby-engine nginx ranger bat tldr lsd duf zoxide fd-find btop nmap fzf" ;;
-    alpine)        EXTRAS="fastfetch docker nginx ranger bat tldr lsd duf zoxide fd btop nmap fzf procps iproute2 coreutils" ;;
+    arch)          EXTRAS="fastfetch docker nginx yazi bat tldr lsd duf zoxide fd btop nmap fzf" ;;
+    debian|ubuntu) EXTRAS="fastfetch docker.io nginx yazi bat tldr lsd duf zoxide fd-find btop nmap fzf" ;;
+    fedora)        EXTRAS="fastfetch moby-engine nginx yazi bat tldr lsd duf zoxide fd-find btop nmap fzf" ;;
+    alpine)        EXTRAS="fastfetch docker nginx yazi bat tldr lsd duf zoxide fd btop nmap fzf procps iproute2 coreutils" ;;
     termux)        EXTRAS="fastfetch zoxide lsd bat fzf" ;;
 esac
 

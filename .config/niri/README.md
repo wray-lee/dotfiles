@@ -193,7 +193,10 @@ too). xwayland-satellite is started on demand by niri.
   D-Bus (fcitx5 holds input-method-v2, so it never pops up on text focus). The
   laptop has no tablet-mode switch, so `udev/90-osk-keyboard-cover.rules` shows
   it when the keyboard cover is detached and hides it when attached; the waybar
-  `custom/osk` button toggles it by touch. The rule must be installed into
+  `custom/osk` button toggles it by touch. Its layout is squeekboard's terminal
+  layout (arrows, Esc/Tab/Ctrl/Alt); landscape is a custom 15-column laptop layout,
+  installed as `us.yaml`/`us_wide.yaml` and `terminal/` (used when a terminal has focus) in
+  `~/.local/share/squeekboard/keyboards/`. The rule must be installed into
   `/etc/udev/rules.d/` (command in the file). Display rotation is **not ported**.
 - Window widths: niri has no "fill when alone" option, so `scripts/autofill.sh`
   follows the IPC event stream and, when a workspace's tiled column count
@@ -217,7 +220,7 @@ too). xwayland-satellite is started on demand by niri.
 2. `niri msg outputs`; if the panel is not `eDP-1`, rename it in
    `conf/outputs.kdl` and in `conf/input.kdl` (`touch { map-to-output }`).
 3. Check the external monitor's model string in `conf/outputs.kdl`.
-4. Install/verify: niri, waybar, rofi, swaync, wlogout, hyprlock, hypridle,
+4. Install/verify: niri, waybar, rofi, nwg-drawer (touch launcher), swaync, wlogout, hyprlock, hypridle,
    wallust, awww, kitty, tmux, fcitx5, cliphist, wl-clipboard, grim, slurp,
    swappy, jq, playerctl, cava, wlsunset (or gammastep), xwayland-satellite,
    a polkit agent.

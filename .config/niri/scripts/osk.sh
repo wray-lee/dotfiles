@@ -21,6 +21,8 @@ visible() { busctl get-property --user sm.puri.OSK0 /sm/puri/OSK0 sm.puri.OSK0 V
 
 ensure_running() {
     pgrep -u "$UID" -x squeekboard >/dev/null && return 0
+    # taller landscape panel so the 15-column us_wide.yaml keys are not flat
+    gsettings set sm.puri.Squeekboard scale-in-horizontal-screen-orientation 1.4 || true
     setsid -f squeekboard >/dev/null 2>&1
     for _ in $(seq 20); do
         busctl --user status sm.puri.OSK0 >/dev/null 2>&1 && return 0

@@ -1,0 +1,146 @@
+# Language: English (US)
+# Landscape layout for the 16:10 panel, laptop-style: 15 units per row so the
+# keys stay near-square across the full width (squeekboard's own wide layouts
+# have 10-11 columns and turn into flat strips when stretched). Shift switches
+# to the "upper" view, so every ASCII character is two taps at most; Ctrl/Alt
+# are real modifiers for terminal shortcuts. The panel height comes from
+# scripts/osk.sh (scale-in-horizontal-screen-orientation).
+# The same file is installed as terminal/us_wide.yaml (terminal focus).
+---
+outlines:
+    default: { width: 61,     height: 42 }
+    w15:     { width: 91.5,   height: 42 }
+    w2:      { width: 122,    height: 42 }
+    w3:      { width: 183,    height: 42 }
+    space8:  { width: 488,    height: 42 }
+    space7:  { width: 427,    height: 42 }
+
+views:
+    base:
+        - "Esc 1 2 3 4 5 6 7 8 9 0 - = BackSpace"
+        - "Tab q w e r t y u i o p [ ] \\"
+        - "Ctrl a s d f g h j k l ; ' Return"
+        - "show_upper z x c v b n m , . / Up `"
+        - "show_actions preferences Alt space Left Down Right"
+    upper:
+        - "Esc ! @ # $ % ^ & * ( ) _ + BackSpace"
+        - "Tab Q W E R T Y U I O P { } |"
+        - "Ctrl A S D F G H J K L : \" Return"
+        - "show_upper Z X C V B N M < > ? Up ~"
+        - "show_actions preferences Alt space Left Down Right"
+    actions:
+        - "Esc F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 BackSpace"
+        - "Tab Home End PageUp PageDown Insert Del Pause Menu Break"
+        - "Ctrl Alt space7 Return Up Del"
+        - "show_letters preferences ShiftMod space Left Down Right"
+
+buttons:
+    show_upper:
+        action:
+            locking:
+                lock_view: "upper"
+                unlock_view: "base"
+        outline: "w3"
+        icon: "key-shift"
+    show_actions:
+        action:
+            set_view: "actions"
+        outline: "w15"
+        label: "Fn"
+    show_letters:
+        action:
+            set_view: "base"
+        outline: "w15"
+        label: "ABC"
+    preferences:
+        action: "show_prefs"
+        icon: "keyboard-mode-symbolic"
+    BackSpace:
+        outline: "w2"
+        icon: "edit-clear-symbolic"
+        action: "erase"
+    Return:
+        outline: "w2"
+        icon: "key-enter"
+        keysym: "Return"
+    space:
+        outline: "space8"
+        text: " "
+    space7:
+        outline: "space7"
+        text: " "
+    Esc:
+        keysym: "Escape"
+    Tab:
+        outline: "w15"
+        keysym: "Tab"
+    "\\":
+        outline: "w15"
+    "|":
+        outline: "w15"
+    Ctrl:
+        modifier: "Control"
+        outline: "w2"
+        label: "Ctrl"
+    Alt:
+        modifier: "Alt"
+        outline: "w15"
+        label: "Alt"
+    ShiftMod:
+        modifier: "Shift"
+        outline: "w15"
+        label: "Shift"
+    Up:
+        label: "↑"
+        keysym: "Up"
+    Down:
+        label: "↓"
+        keysym: "Down"
+    Left:
+        label: "←"
+        keysym: "Left"
+    Right:
+        label: "→"
+        keysym: "Right"
+    F1: { keysym: "F1" }
+    F2: { keysym: "F2" }
+    F3: { keysym: "F3" }
+    F4: { keysym: "F4" }
+    F5: { keysym: "F5" }
+    F6: { keysym: "F6" }
+    F7: { keysym: "F7" }
+    F8: { keysym: "F8" }
+    F9: { keysym: "F9" }
+    F10: { keysym: "F10" }
+    F11: { keysym: "F11" }
+    F12: { keysym: "F12" }
+    Home:
+        outline: "w15"
+        keysym: "Home"
+    End:
+        outline: "w15"
+        keysym: "End"
+    PageUp:
+        outline: "w15"
+        keysym: "Page_Up"
+        label: "PgUp"
+    PageDown:
+        outline: "w15"
+        keysym: "Page_Down"
+        label: "PgDn"
+    Insert:
+        outline: "w15"
+        keysym: "Insert"
+        label: "Ins"
+    Del:
+        outline: "w15"
+        keysym: "Delete"
+    Pause:
+        outline: "w15"
+        keysym: "Pause"
+    Menu:
+        outline: "w15"
+        keysym: "Menu"
+    Break:
+        outline: "w15"
+        keysym: "Break"

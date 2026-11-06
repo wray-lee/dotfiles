@@ -69,6 +69,8 @@
 },
 
 "custom/menu": {
+	// rofi has no touch input; the GTK drawer works with finger, pen and mouse
+	"on-click": "pkill -x nwg-drawer || nwg-drawer -term kitty -fm thunar",
 	"on-click-middle": "$HOME/.config/niri/scripts/wallpaper-select.sh",
 	"on-click-right": "$HOME/.config/niri/scripts/waybar-niri.sh --layout"
 },
