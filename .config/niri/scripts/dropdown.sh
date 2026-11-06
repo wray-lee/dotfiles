@@ -72,7 +72,11 @@ workspace_name() {
 }
 
 spawn_dropdown() {
-    niri msg action spawn -- kitty --app-id "$APP_ID" -e tmux new -A -s dropdown
+    # niri hands spawned apps an activation token; kitty uses it once mapped and
+    # niri then jumps to the window's workspace, i.e. the hidden "scratch" one.
+    # Drop it: showing and focusing is this script's job.
+    niri msg action spawn -- env -u XDG_ACTIVATION_TOKEN -u DESKTOP_STARTUP_ID \
+        kitty --app-id "$APP_ID" -e tmux new -A -s dropdown
 }
 
 hide_window() {
