@@ -9,6 +9,10 @@ input {
         // option is needed here; layout is the US keymap the user types on.
         xkb {
             layout "us"
+            // us gives FK13-FK24 no keysym, so the laptop's side custom key
+            // (reported as KEY_F13) reached niri as nothing. This option maps
+            // them, which makes the F13 bind in binds/apps.kdl match.
+            options "fkeys:basic_13-24"
         }
         numlock
         repeat-delay 300

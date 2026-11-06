@@ -33,6 +33,8 @@ binds {
     Mod+Shift+O repeat=false hotkey-overlay-title="Change zsh theme" { spawn-sh "$HOME/.config/niri/scripts/zsh-theme.sh"; }
     Mod+Shift+Return repeat=false hotkey-overlay-title="Dropdown terminal" { spawn-sh "$HOME/.config/niri/scripts/dropdown.sh"; }
     Mod+Shift+G repeat=false hotkey-overlay-title="Toggle game mode" { spawn-sh "$HOME/.config/niri/scripts/gamemode.sh toggle"; }
+    // Laptop's side custom key; firmware reports it as KEY_F13 (raw HID byte 0x68).
+    F13 repeat=false hotkey-overlay-title="Hellfire browser" { spawn "hellfire"; }
 }
 
 // ---------------------------------------------------------------------------

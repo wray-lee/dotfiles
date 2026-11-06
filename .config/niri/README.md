@@ -136,6 +136,7 @@ Hyprland's "window" in most cases.
 | `Mod+N` | Toggle night light |
 | `Mod+Shift+G` | Game mode (`scripts/gamemode.sh`) |
 | `Mod+Shift+N` | Notification centre |
+| `F13` | Laptop's side custom key: open hellfire. The hardware sends `KEY_F13`, which `us` does not map; `conf/input.kdl` loads `fkeys:basic_13-24` to give it a keysym. |
 
 ### Windows and columns (`conf/binds/windows.kdl`)
 
