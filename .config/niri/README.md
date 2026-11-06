@@ -4,7 +4,7 @@ A self-contained desktop for niri 26.04 (new touchscreen laptop), built to feel
 like the existing Hyprland session. Nothing outside `~/.config/niri/` is edited.
 The only additions elsewhere are new waybar files (`ModulesNiri`,
 `ModulesNiriOverrides`, `configs/[TOP] Niri Laptop`, `config-niri`); existing
-waybar files, `~/.config/hypr`, `~/.config/wlogout`, `~/.config/rofi`,
+waybar files, `~/.config/hypr` (kept in this repo at `hypr/` next to this file), `~/.config/wlogout`, `~/.config/rofi`,
 `~/.config/swaync` and `~/.config/wallust` are read-only inputs.
 
 ## How the pieces fit (design contract)
