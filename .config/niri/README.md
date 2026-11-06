@@ -84,7 +84,7 @@ niri validate -c ~/.config/niri/config.kdl   # must print: config is valid
 | `scripts/wallpaper-select.sh` | Pick a wallpaper per output, save state, recolour. |
 | `scripts/wallpaper-random.sh` | Random wallpaper. |
 | `scripts/wallpaper-effects.sh` | Wallpaper effects/transform, recolour. |
-| `scripts/dropdown.sh` | Toggle (or `--prewarm`) the kitty+tmux dropdown. |
+| `scripts/dropdown.sh` | Toggle the kitty+tmux dropdown. |
 | `scripts/float-all.sh` | Float/unfloat every window on the workspace (`Mod+Alt+Space`). |
 | `scripts/scratch-toggle.sh` | Toggle the `scratch` workspace (second press returns). |
 | `scripts/gamemode.sh` | Toggle game mode (DND, fullscreen, no bar, no animations/gaps). |
@@ -157,8 +157,9 @@ symlink by default; `scripts/waybar-niri.sh --style` lets you pick any style in
 `conf/startup.kdl` starts: polkit agent, wallpaper daemon (also recolours),
 night-light restore, swaync, waybar (`waybar-niri.sh Laptop`), hypridle with
 `idle/hypridle.conf`, fcitx5, two cliphist watchers, nm-applet,
-blueman-applet, and `dropdown.sh --prewarm` (Hyprland pre-warmed the dropdown
-too). xwayland-satellite is started on demand by niri.
+blueman-applet, autofill, refresh-rate and gestures. The dropdown is not
+pre-warmed (unlike Hyprland); it starts on the first `Mod+Shift+Return`.
+xwayland-satellite is started on demand by niri.
 
 ## Behaviour parity and deliberate differences
 
@@ -167,7 +168,7 @@ too). xwayland-satellite is started on demand by niri.
 | Blur toggle (`Mod+Alt+O`) | niri has global + per-rule blur but **no runtime toggle**; the key toggles the window opacity rule instead. |
 | Opacity presets | Static active/inactive and per-app values in `conf/window-rules.kdl`; `toggle-window-rule-opacity` changes the focused window at runtime. |
 | Special workspace | Named workspace `scratch`; `Mod+U` toggles back to the previous workspace. |
-| Dropdown terminal | Window parked on `scratch`; pre-warmed at login; `Mod+Shift+Return`. |
+| Dropdown terminal | Window parked on `scratch`; started on first use, not at login; `Mod+Shift+Return`. |
 | Touchpad toggle | Works: `conf/local/touchpad.kdl` is included and hot-reloaded. |
 | Game mode | Works: animations off + gaps 0 via `conf/local/gamemode.kdl`, DND, fullscreen, bar stopped (restored on exit). |
 | Power menu | `wlogout.sh` uses `idle/wlogout.layout`; Logout is `niri msg action quit --skip-confirmation`. |

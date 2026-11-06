@@ -5,7 +5,7 @@
 # "scratch" workspace while hidden: it stays mapped off-screen. `tmux new -A`
 # keeps the session, so hide/show behaves like a Hyprland dropdown.
 #
-# Usage: dropdown.sh [-d|--debug] [--prewarm]
+# Usage: dropdown.sh [-d|--debug]
 set -euo pipefail
 SELF_DIR=$(CDPATH='' cd -- "$(dirname -- "$(readlink -f -- "$0")")" && pwd)
 # shellcheck source-path=SCRIPTDIR source=lib/common.sh
@@ -18,12 +18,10 @@ LAST_FILE="/tmp/niri-dropdown.last"
 DEBOUNCE_MS=250
 
 DEBUG=false
-PREWARM=false
 for arg in "$@"; do
     case "$arg" in
         -d | --debug) DEBUG=true ;;
-        --prewarm) PREWARM=true ;;
-        -h | --help) printf 'usage: %s [-d|--debug] [--prewarm]\n' "$0"; exit 0 ;;
+        -h | --help) printf 'usage: %s [-d|--debug]\n' "$0"; exit 0 ;;
         *)
             printf 'unknown option: %s\n' "$arg" >&2
             exit 2
@@ -88,10 +86,8 @@ id=$(window_id)
 if [[ -z $id ]]; then
     log "no dropdown window, spawning"
     spawn_dropdown
-    # The window rule opens it on the hidden workspace, so a prewarm is done
-    # even when kitty is slow to map at boot (polling here used to give up and
-    # leave the dropdown on screen). A toggle waits for it, then shows it below.
-    $PREWARM && exit 0
+    # The window rule opens it on the hidden workspace; wait for it to map,
+    # then the show branch below brings it to the current workspace.
     for _ in {1..50}; do
         id=$(window_id)
         [[ -n $id ]] && break
@@ -101,14 +97,6 @@ if [[ -z $id ]]; then
 fi
 
 ws=$(workspace_of_window "$id")
-
-if $PREWARM; then
-    # Already running: make sure it is parked on the hidden workspace.
-    if [[ $(workspace_name "$ws") != "$SCRATCH_WS" ]]; then
-        hide_window "$id"
-    fi
-    exit 0
-fi
 
 if [[ $(workspace_name "$ws") == "$SCRATCH_WS" ]]; then
     current_idx=$(niri_json workspaces | jq -r 'first(.[] | select(.is_focused) | .idx) // empty')

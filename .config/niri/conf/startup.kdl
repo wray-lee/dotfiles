@@ -26,9 +26,8 @@ spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/waybar-niri.s
 // Idle/lock handling (niri-tuned config, idle/hypridle.conf).
 spawn-at-startup "sh" "-c" "exec hypridle -c \"$HOME/.config/niri/idle/hypridle.conf\""
 
-// Pre-warm the dropdown terminal on the hidden "scratch" workspace, like
-// Hyprland's exec-once Dropterminal.sh (first Mod+Shift+Return is instant).
-spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/dropdown.sh\" --prewarm"
+// The dropdown terminal is not pre-warmed: it starts on the first
+// Mod+Shift+Return (a second or so), so nothing extra runs from login.
 
 // Hyprland-like widths: a lone column fills the output, two split 50/50.
 spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/autofill.sh\""
