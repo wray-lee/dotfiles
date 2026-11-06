@@ -1,7 +1,9 @@
 if [ -z "${DISPLAY}" ] && [ -z "${WAYLAND_DISPLAY}" ] && [ "${XDG_VTNR:-0}" -eq 1 ]; then
     # niri wins when both are installed; -l stops niri-session re-running this file
     if command -v niri-session >/dev/null 2>&1; then
-        exec niri-session -l
+        # niri-session runs `systemctl --user import-environment` with no names,
+        # which systemd 262 flags as deprecated on tty1; drop just that line
+        exec niri-session -l 2> >(grep -v --line-buffered 'import-environment without a list' >&2)
     elif command -v Hyprland >/dev/null 2>&1; then
         Hyprland
     fi

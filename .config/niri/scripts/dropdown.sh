@@ -84,17 +84,16 @@ id=$(window_id)
 if [[ -z $id ]]; then
     log "no dropdown window, spawning"
     spawn_dropdown
-    if $PREWARM; then
-        for _ in {1..30}; do
-            id=$(window_id)
-            [[ -n $id ]] && break
-            sleep 0.1
-        done
-        if [[ -n $id ]]; then
-            hide_window "$id"
-        fi
-    fi
-    exit 0
+    # The window rule opens it on the hidden workspace, so a prewarm is done
+    # even when kitty is slow to map at boot (polling here used to give up and
+    # leave the dropdown on screen). A toggle waits for it, then shows it below.
+    $PREWARM && exit 0
+    for _ in {1..50}; do
+        id=$(window_id)
+        [[ -n $id ]] && break
+        sleep 0.1
+    done
+    [[ -n $id ]] || exit 0
 fi
 
 ws=$(workspace_of_window "$id")

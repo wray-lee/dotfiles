@@ -174,6 +174,9 @@ window-rule {
     default-column-width { proportion 0.65; }
     default-window-height { proportion 0.65; }
     default-floating-position x=0 y=120 relative-to="top"
+    // born hidden: dropdown.sh moves it to the current workspace to show it
+    open-on-workspace "scratch"
+    open-focused false
 }
 
 // ===========================================================================
