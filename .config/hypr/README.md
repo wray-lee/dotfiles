@@ -67,7 +67,7 @@ Main modifier `SUPER` (`Mod`). `Mod+H` opens the KooL cheat sheet and
 | `Ctrl+Alt+B` | Default browser |
 | `Mod+X` | Terminal (kitty) |
 | `Mod+E` | File manager (thunar) |
-| `Mod+A` | Desktop overview |
+| `Mod+A` | Window overview (rofi window list; quickshell/AGS overview is not usable here) |
 | `Mod+Ctrl+S` | Window switcher (rofi) |
 | `Mod+period` | Emoji menu |
 | `Mod+Alt+C` | Calculator |

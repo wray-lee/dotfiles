@@ -216,7 +216,8 @@ hl.animation({ leaf = "workspacesOut", enabled = true, speed = 5, bezier = "winO
 -- Applications & Menus
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("pkill rofi || true && rofi -show drun -modi drun,filebrowser,run,window"), { description = "app launcher" })
 hl.bind("CTRL + ALT + B", hl.dsp.exec_cmd("xdg-open 'https://'"), { description = "open default browser" })
-hl.bind(mainMod .. " + A", hl.dsp.exec_cmd(scripts .. "/OverviewToggle.sh"), { description = "desktop overview" })
+-- quickshell/AGS overview is not installed/working here; rofi's window list instead
+hl.bind(mainMod .. " + A", hl.dsp.exec_cmd("pkill rofi || rofi -show window"), { description = "window overview (rofi)" })
 hl.bind(mainMod .. " + X", hl.dsp.exec_cmd("kitty"), { description = "open terminal" })
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd("thunar"), { description = "file manager" })
 hl.bind(mainMod .. " + H", hl.dsp.exec_cmd(scripts .. "/KeyHints.sh"), { description = "help cheat sheet" })
