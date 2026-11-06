@@ -24,11 +24,13 @@ layer-rule {
     }
 }
 
-// notification popups
+// notification popups: no blur. swaync's popup surface is a transparent strip
+// as tall as the output, so niri's whole-rectangle blur (see the waybar note
+// below) drew a blurred column down the middle of the screen.
 layer-rule {
     match namespace="^swaync-notification-window$"
     background-effect {
-        blur true
+        blur false
     }
 }
 

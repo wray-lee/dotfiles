@@ -24,8 +24,9 @@ environment {
     EDITOR "nvim"
 
     // fcitx5 input method. GLFW covers kitty; SDL covers games.
+    // No GTK_IM_MODULE: niri has text-input-v3, GTK uses it natively, and
+    // fcitx5 notifies "recommend unset GTK_IM_MODULE" at every login if set.
     XMODIFIERS "@im=fcitx"
-    GTK_IM_MODULE "fcitx"
     QT_IM_MODULE "fcitx"
     SDL_IM_MODULE "fcitx"
     GLFW_IM_MODULE "fcitx"
