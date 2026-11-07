@@ -11,7 +11,7 @@ Helper: `cu` in this skill's directory (bash). Run it with no args for usage. It
 Run `cu doctor`, then `cu calibrate`. If any line says FAIL, stop and tell the user the fix, do not work around it:
 - `/dev/uinput` not writable: user needs `sudo usermod -aG input $USER`, then log out and back in.
 - ydotoold not running (keyboard only): `systemctl --user enable --now ydotool`.
-- monitor asleep (dpms off): `grim` blocks forever. Moving the pointer (`cu move 10 10`) wakes it.
+- monitor asleep (dpms off): `grim` cannot capture it (`cu shot` times out after 15 s). Moving the pointer (`cu move 10 10`) wakes it.
 - `calibrate` FAIL: do not click, the pointer is not landing where asked.
 
 ## How input works (do not "simplify" this)
@@ -26,12 +26,15 @@ Run `cu doctor`, then `cu calibrate`. If any line says FAIL, stop and tell the u
 3. `cu shot` again and check the result before the next step. Never chain several blind clicks.
 
 ## Rules
-- `cu type "text"` pastes through the clipboard (works for Chinese), and restores the old clipboard. In terminals pass the paste combo: `cu type "text" ctrl+shift+v`.
-- `cu key` takes combos like `ctrl+l`, `super+1`, `enter`, `esc`. Names come from linux `KEY_*`.
+- `cu type "text"` pastes through the clipboard (works for Chinese), then restores the previous clipboard (text or one binary type) after 0.5 s, also on failure. In terminals pass the paste combo: `cu type "text" ctrl+shift+v`.
+- `cu key` takes combos like `ctrl+l`, `super+1`, `enter`, `esc`. Names are linux `KEY_*` names with or without the prefix (`leftctrl`, `KEY_F5`, `a`), plus aliases `ctrl shift alt super return escape del pgup pgdn`.
 - `cu windows` lists windows (address, focused `*`, class, title). `cu focus ADDRESS` switches. Prefer this over clicking to change windows. On Hyprland 0.5x+ dispatchers are Lua (`hl.dsp.focus({ window = "address:0x.." })`); `cu focus` falls back to the classic syntax on older versions.
 - A fullscreen window (e.g. a game-stream client) covers everything: check `cu windows` first and do not input into it by accident.
 - Click and type are real actions. Confirm with the user before anything destructive or outward-facing (send, delete, pay, submit, close unsaved work).
 - Do not type passwords or read secrets off the screen.
+- If `cu` exits non-zero it printed why and did nothing past that point (bad args, off-screen point, compositor or pointer daemon unreachable). Read the message; do not retry blindly.
+- After updating `pointer.py`, the next `cu` call restarts the daemon by itself. `cu stop` removes the daemon and its virtual device; run it when you are done.
+- Screenshots and the daemon log go to `$XDG_RUNTIME_DIR/cu` (private to the user, cleared at logout).
 - Single monitor only. Multi-monitor mapping is untested.
 
 ## Verified (eDP-1 rotated 90deg, 1200x1920 logical, scale 1.5, Hyprland 0.57.0)

@@ -5,7 +5,7 @@ description: Operate desktop GUI apps on this Wayland/niri Linux machine by scre
 
 # niri computer use
 
-Helper: `cu` in this skill's directory (bash). Run it with no args for usage.
+Helper: `cu` in this skill's directory (bash). Run it with no args for usage. It finds `NIRI_SOCKET` and `WAYLAND_DISPLAY` itself, so it also works from ssh.
 
 ## Before first use
 Run `cu doctor`. If any line says FAIL, stop and tell the user the fix, do not work around it:
@@ -23,14 +23,17 @@ Run `cu doctor`. If any line says FAIL, stop and tell the user the fix, do not w
 3. `cu shot` again and check the result before the next step. Never chain several blind clicks.
 
 ## Rules
-- `cu type "text"` pastes through the clipboard (works for Chinese), and restores the old clipboard. In terminals pass the paste combo: `cu type "text" ctrl+shift+v`.
-- `cu key` takes combos like `ctrl+l`, `super+1`, `enter`, `esc`. Names come from linux `KEY_*`.
+- `cu type "text"` pastes through the clipboard (works for Chinese), then restores the previous clipboard (text or one binary type) after 0.5 s, also on failure. In terminals pass the paste combo: `cu type "text" ctrl+shift+v`.
+- `cu key` takes combos like `ctrl+l`, `super+1`, `enter`, `esc`. Names are linux `KEY_*` names with or without the prefix (`leftctrl`, `KEY_F5`, `a`), plus aliases `ctrl shift alt super return escape del pgup pgdn`.
 - `cu windows` lists niri windows (id, focused `*`, app_id, title). `cu focus ID` switches. Prefer this over clicking to change windows.
 - The pointer is often missing from `cu shot` in terminals (they hide it). Do not treat that as a failed move.
 - Click and type are real actions. Confirm with the user before anything destructive or outward-facing (send, delete, pay, submit, close unsaved work).
 - Do not type passwords or read secrets off the screen.
+- If `cu` exits non-zero it printed why and did nothing past that point (bad args, off-screen point, compositor or pointer daemon unreachable). Read the message; do not retry blindly.
+- After updating `pointer.py`, the next `cu` call restarts the daemon by itself. `cu stop` removes the daemon and its virtual device; run it when you are done.
+- Screenshots and the daemon log go to `$XDG_RUNTIME_DIR/cu` (private to the user, cleared at logout).
 - Single output only. Multi-monitor mapping is untested.
 - Failing clicks: re-run `cu shot`, the layout may have moved. Check focus with `cu windows`.
 
-## Verified (eDP-1, 1920x1200 logical, scale 1.5)
-Absolute moves are linear to the pixel; left/right click, wheel and drag land where requested (checked with a kitty mouse-reporting probe).
+## Verified (eDP-1, 1920x1200 logical, scale 1.5, niri)
+Absolute moves are linear to the pixel; left/right/double click, wheel, drag, keys, Chinese paste and clipboard restore checked end to end with a kitty mouse-reporting probe. niri has no cursor-position IPC, so there is no `pos`/`calibrate` here: check a click by the next `cu shot`.
