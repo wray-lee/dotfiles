@@ -4,7 +4,7 @@ A self-contained desktop for niri 26.04 (new touchscreen laptop), built to feel
 like the existing Hyprland session. Nothing outside `~/.config/niri/` is edited.
 The only additions elsewhere are new waybar files (`ModulesNiri`,
 `ModulesNiriOverrides`, `configs/[TOP] Niri Laptop`, `config-niri`); existing
-waybar files, `~/.config/hypr` (kept in this repo at `hypr/` next to this file), `~/.config/wlogout`, `~/.config/rofi`,
+waybar files, `~/.config/hypr`, `~/.config/wlogout`, `~/.config/rofi`,
 `~/.config/swaync` and `~/.config/wallust` are read-only inputs.
 
 ## How the pieces fit (design contract)
@@ -84,7 +84,7 @@ niri validate -c ~/.config/niri/config.kdl   # must print: config is valid
 | `scripts/wallpaper-select.sh` | Pick a wallpaper per output, save state, recolour. |
 | `scripts/wallpaper-random.sh` | Random wallpaper. |
 | `scripts/wallpaper-effects.sh` | Wallpaper effects/transform, recolour. |
-| `scripts/dropdown.sh` | Toggle the kitty+tmux dropdown. |
+| `scripts/dropdown.sh` | Toggle (or `--prewarm`) the kitty+tmux dropdown. |
 | `scripts/float-all.sh` | Float/unfloat every window on the workspace (`Mod+Alt+Space`). |
 | `scripts/scratch-toggle.sh` | Toggle the `scratch` workspace (second press returns). |
 | `scripts/gamemode.sh` | Toggle game mode (DND, fullscreen, no bar, no animations/gaps). |
@@ -96,7 +96,6 @@ niri validate -c ~/.config/niri/config.kdl   # must print: config is valid
 | `scripts/brightness.sh`, `scripts/brightness-kbd.sh` | Panel and keyboard backlight. |
 | `scripts/nightlight.sh` | wlsunset/gammastep blue-light filter with saved state. |
 | `scripts/airplane.sh` | Toggle airplane mode. |
-| `scripts/refresh-rate.sh` | Panel refresh rate follows the power profile (power-saver 60 Hz, otherwise 120 Hz). |
 | `scripts/kill-window.sh` | Kill the focused process. |
 | `scripts/lid.sh` | Lid policy from `switch-events` (panel off behind an external). |
 | `scripts/clipmanager.sh` | cliphist + rofi clipboard history. |
@@ -106,115 +105,33 @@ niri validate -c ~/.config/niri/config.kdl   # must print: config is valid
 
 ## Key bindings
 
-Main modifier is `SUPER` (`Mod`). `Mod+H` (or `Mod+Shift+/`, `Mod+Shift+K`) opens
-niri's hotkey overlay, generated from `conf/binds/*.kdl`; that is the source of
-truth, the tables below mirror it. niri lays windows out as columns that run
-horizontally, each column stacking windows vertically, so "column" below is
-Hyprland's "window" in most cases.
+Main modifier is `SUPER` (`Mod`). Full list: `Mod+H` (or `Mod+Shift+/`) opens
+niri's hotkey overlay, generated from these files.
 
-### Apps and menus (`conf/binds/apps.kdl`)
-
-| Keys | Action |
-|---|---|
-| `Mod+S` | App launcher (rofi drun) |
-| `Ctrl+Alt+B` | Default browser |
-| `Mod+X` | Terminal (kitty) |
-| `Mod+E` | File manager (thunar) |
-| `Mod+A` | Overview |
-| `Mod+Ctrl+S` | Window switcher (rofi) |
-| `Mod+period` | Emoji menu |
-| `Mod+Alt+C` | Calculator |
-| `Mod+Alt+V` | Clipboard history |
-| `Mod+Shift+M` | Online music (rofi-beats) |
-| `Mod+Shift+O` | Change zsh theme |
-| `Mod+Alt+R` | Refresh bar and notification UI |
-| `Mod+Ctrl+I` | Restart fcitx5 (it sometimes shows candidates but stops committing text) |
-| `Mod+Shift+Return` | Dropdown terminal (kitty + tmux, first press starts it) |
-| `Mod+W`, `Mod+Shift+W`, `Ctrl+Alt+W` | Wallpaper select / effects / random |
-| `Mod+Ctrl+Alt+B` | Toggle waybar |
-| `Mod+Ctrl+B`, `Mod+Alt+B` | Waybar style / layout menu |
-| `Mod+N` | Toggle night light |
-| `Mod+Shift+G` | Game mode (`scripts/gamemode.sh`) |
-| `Mod+Shift+N` | Notification centre |
-| `F13` | Laptop's side custom key: open hellfire. The hardware sends `KEY_F13`, which `us` does not map; `conf/input.kdl` loads `fkeys:basic_13-24` to give it a keysym. |
-
-### Windows and columns (`conf/binds/windows.kdl`)
-
-| Keys | Action |
-|---|---|
-| `Mod+D`, `Mod+Escape` | Close window |
-| `Alt+F4` | Kill the window's process |
-| `Ctrl+Alt+Delete` | Exit niri |
-| `Mod+Shift+F` | Fullscreen |
-| `Mod+Ctrl+F` | Maximize column |
-| `Alt+Space`, `Mod+P` | Toggle floating (`Mod+P` replaces Hyprland's pseudo tile) |
-| `Mod+Alt+Space` | Float every window on the workspace (on, not toggle) |
-| `Mod+Ctrl+O`, `Mod+T`, `Mod+Alt+O` | Toggle the opacity rule (niri has no runtime blur toggle) |
-| `Ctrl+Alt+Left/Right` | Focus column left / right (or monitor) |
-| `Ctrl+Alt+Up/Down` | Focus window up / down (or monitor) |
-| `Alt+Tab` | Previously focused window |
-| `Mod+Left/Right` | Move column left / right |
-| `Mod+Up/Down` | Move window up / down in the column |
-| `Mod+Alt+Left/Right` | Narrow / widen column |
-| `Mod+Alt+Up/Down` | Shorten / heighten window |
-| `Mod+Alt+L` | Cycle column width preset |
-| `Mod+M` | Column width 30% |
-| `Mod+I` | Consume window into column |
-| `Mod+Ctrl+D`, `Mod+Ctrl+H` | Expel window from column |
-| `Mod+Ctrl+K`, `Mod+Ctrl+L` | Consume or expel window left / right |
-| `Mod+Ctrl+Return` | Move column to first |
-| `Mod+Shift+I`, `Mod+G` | Toggle tabbed column (group) |
-| `Mod+Ctrl+Tab`, `Mod+Ctrl+Shift+Tab` | Next / previous window in the column |
-
-### Workspaces (`conf/binds/workspaces.kdl`)
-
-Workspaces `1` to `10` plus the named `scratch` workspace.
-
-| Keys | Action |
-|---|---|
-| `Mod+1` .. `Mod+0` | Go to workspace 1..10 |
-| `Mod+Ctrl+1` .. `Mod+Ctrl+0` | Move column to workspace 1..10 |
-| `Mod+Tab`, `Mod+Shift+Tab` | Next / previous workspace |
-| `Mod+grave` | Previously focused workspace |
-| `Mod+Ctrl+[` / `Mod+Ctrl+]` | Move column to previous / next workspace |
-| `Mod+Shift+Left/Right/Up/Down` | Move the workspace to the monitor in that direction |
-| `Mod+U` | Toggle `scratch` (second press returns) |
-| `Mod+Shift+U` | Move column to `scratch` |
-
-### System and media (`conf/binds/media-system.kdl`)
-
-| Keys | Action |
-|---|---|
-| `Mod+L` | Lock screen |
-| `Ctrl+Alt+P` | Power menu (wlogout) |
-| `XF86Audio*` | Volume, mic mute, transport keys (also while locked) |
-| `XF86MonBrightness*`, `XF86KbdBrightness*` | Panel / keyboard backlight |
-| `XF86Sleep`, `XF86Rfkill` | Suspend, airplane mode |
-| `XF86Launch1/3/4` | ROG Control Center, keyboard RGB profile, fan profile |
-
-### Screenshots (`conf/binds/screenshot.kdl`)
-
-| Keys | Action |
-|---|---|
-| `Mod+Print`, `Mod+F6` | Screen |
-| `Mod+Shift+S`, `Mod+Shift+F6` | Area |
-| `Alt+F6` | Active window |
-| `Mod+Ctrl+F6`, `Mod+Alt+F6` | Screen after 5 s / 10 s |
-
-### Pointer and touch (`conf/binds/mouse-touch.kdl`, `scripts/gestures.sh`)
-
-| Input | Action |
-|---|---|
-| `XF86TouchpadToggle`, `Mod+Shift+T` | Toggle touchpad |
-| `Mod+wheel down/up` | Next / previous workspace |
-| `Mod+Ctrl+wheel down/up` | Move column to next / previous workspace |
-| `Mod+wheel left/right` | Focus column left / right |
-| `Mod+Ctrl+wheel left/right` | Move column left / right |
-| Touchscreen: 3 fingers up / down | Show / hide the on-screen keyboard |
-| Touchscreen: 3 fingers left / right | Focus the column to the right / left |
-| Touchscreen: 4 fingers up | Overview |
-| Touchscreen: swipe down from top edge | Notification centre |
-| Touchscreen: swipe up from bottom edge | App launcher (nwg-drawer) |
+- **Apps**: `Mod+S` rofi drun, `Ctrl+Alt+B` browser, `Mod+X` kitty, `Mod+E`
+  thunar, `Mod+A` overview, `Mod+W` wallpaper, `Mod+Shift+W` effects,
+  `Ctrl+Alt+W` random wallpaper, `Mod+period` emoji, `Mod+Alt+C` calculator,
+  `Mod+Alt+V` clipboard, `Mod+Ctrl+S` window switcher, `Mod+Shift+M`
+  rofi-beats, `Mod+Shift+O` zsh theme.
+- **Bar**: `Mod+Ctrl+Alt+B` toggle bar, `Mod+Ctrl+B` style picker,
+  `Mod+Alt+B` layout picker, `Mod+Alt+R` restart bar/notifications.
+- **Windows**: `Mod+Shift+F` fullscreen, `Mod+Ctrl+F` maximize column,
+  `Alt+Space` float, `Mod+Alt+Space` float every window on the workspace (on,
+  not toggle — matches Hyprland's `allfloat`), `Mod+D`/`Mod+Escape` close,
+  `Alt+F4` kill process, `Mod+P` float (pseudo-tile substitute), `Mod+Shift+I`
+  tabbed column, `Mod+Alt+L` cycle width preset, `Mod+Alt+O` toggle opacity
+  (blur substitute), `Mod+Ctrl+O`/`Mod+T` toggle opacity rule.
+- **Workspaces**: `Mod+1..0` focus, `Mod+Ctrl+1..0` move column,
+  `Mod+Tab`/`Mod+Shift+Tab` next/previous, `Mod+grave` previous,
+  `Mod+Shift+arrows` move workspace to monitor, `Mod+U` toggle `scratch`,
+  `Mod+Shift+U` move column to `scratch`.
+- **Media/system**: `Mod+L` lock, `Ctrl+Alt+P` power menu, XF86 volume/mic/
+  brightness/keyboard-backlight/transport keys, `Mod+N` night light,
+  `Mod+Shift+N` notification centre, `XF86Rfkill` airplane mode.
+- **Screenshots**: `Mod+Print` screen, `Mod+Shift+S` area; the `F6` fallbacks
+  and the 5/10 s timers are in `conf/binds/screenshot.kdl`.
+- **Pointer**: `XF86TouchpadToggle` / `Mod+Shift+T` toggle touchpad,
+  `Mod+wheel` workspace/column navigation.
 
 ## Waybar integration
 
@@ -239,9 +156,8 @@ symlink by default; `scripts/waybar-niri.sh --style` lets you pick any style in
 `conf/startup.kdl` starts: polkit agent, wallpaper daemon (also recolours),
 night-light restore, swaync, waybar (`waybar-niri.sh Laptop`), hypridle with
 `idle/hypridle.conf`, fcitx5, two cliphist watchers, nm-applet,
-blueman-applet, autofill, refresh-rate and gestures. The dropdown is not
-pre-warmed (unlike Hyprland); it starts on the first `Mod+Shift+Return`.
-xwayland-satellite is started on demand by niri.
+blueman-applet, and `dropdown.sh --prewarm` (Hyprland pre-warmed the dropdown
+too). xwayland-satellite is started on demand by niri.
 
 ## Behaviour parity and deliberate differences
 
@@ -250,7 +166,7 @@ xwayland-satellite is started on demand by niri.
 | Blur toggle (`Mod+Alt+O`) | niri has global + per-rule blur but **no runtime toggle**; the key toggles the window opacity rule instead. |
 | Opacity presets | Static active/inactive and per-app values in `conf/window-rules.kdl`; `toggle-window-rule-opacity` changes the focused window at runtime. |
 | Special workspace | Named workspace `scratch`; `Mod+U` toggles back to the previous workspace. |
-| Dropdown terminal | Window parked on `scratch`; started on first use, not at login; `Mod+Shift+Return`. |
+| Dropdown terminal | Window parked on `scratch`; pre-warmed at login; `Mod+Shift+Return`. |
 | Touchpad toggle | Works: `conf/local/touchpad.kdl` is included and hot-reloaded. |
 | Game mode | Works: animations off + gaps 0 via `conf/local/gamemode.kdl`, DND, fullscreen, bar stopped (restored on exit). |
 | Power menu | `wlogout.sh` uses `idle/wlogout.layout`; Logout is `niri msg action quit --skip-confirmation`. |
@@ -276,10 +192,7 @@ xwayland-satellite is started on demand by niri.
   D-Bus (fcitx5 holds input-method-v2, so it never pops up on text focus). The
   laptop has no tablet-mode switch, so `udev/90-osk-keyboard-cover.rules` shows
   it when the keyboard cover is detached and hides it when attached; the waybar
-  `custom/osk` button toggles it by touch. Its layout is squeekboard's terminal
-  layout (arrows, Esc/Tab/Ctrl/Alt); landscape is a custom 15-column laptop layout,
-  installed as `us.yaml`/`us_wide.yaml` and `terminal/` (used when a terminal has focus) in
-  `~/.local/share/squeekboard/keyboards/`. The rule must be installed into
+  `custom/osk` button toggles it by touch. The rule must be installed into
   `/etc/udev/rules.d/` (command in the file). Display rotation is **not ported**.
 - Window widths: niri has no "fill when alone" option, so `scripts/autofill.sh`
   follows the IPC event stream and, when a workspace's tiled column count
@@ -303,13 +216,13 @@ xwayland-satellite is started on demand by niri.
 2. `niri msg outputs`; if the panel is not `eDP-1`, rename it in
    `conf/outputs.kdl` and in `conf/input.kdl` (`touch { map-to-output }`).
 3. Check the external monitor's model string in `conf/outputs.kdl`.
-4. Install/verify: niri, waybar, rofi, nwg-drawer (touch launcher), swaync, wlogout, hyprlock, hypridle,
+4. Install/verify: niri, waybar, rofi, swaync, wlogout, hyprlock, hypridle,
    wallust, awww, kitty, tmux, fcitx5, cliphist, wl-clipboard, grim, slurp,
    swappy, jq, playerctl, cava, wlsunset (or gammastep), xwayland-satellite,
    a polkit agent.
 5. Log in with `niri-session` (or `niri --session`).
 6. Smoke test: `Mod+L` locks, `Ctrl+Alt+P` opens the power menu, `Mod+Print`
-   saves a screenshot, `Mod+Shift+Return` opens the dropdown (about a second the first time),
+   saves a screenshot, `Mod+Shift+Return` opens the dropdown instantly,
    `Mod+U` toggles scratch, `XF86TouchpadToggle`, `Mod+Shift+G`, `Mod+Ctrl+B`
    and `Mod+Alt+B`, and the bar's weather/cava/hint/settings modules.
 7. `cd ~/.config && md5sum -c /tmp/niri-port/baseline.md5 --quiet`
