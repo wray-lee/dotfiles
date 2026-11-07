@@ -76,3 +76,4 @@ alias rdesktop='rdesktop -g 2850x1720 '
 alias kssh="kitty +kitten ssh"
 alias pip='uv pip '
 alias cc-switch="cc-switch-cli"
+alias offm='niri msg action power-off-monitors'
