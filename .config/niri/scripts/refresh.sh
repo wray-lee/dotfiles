@@ -10,9 +10,8 @@ pkill -x rofi 2>/dev/null || true
 
 # Notification daemon: restart so it re-reads its config, then reload rules.
 if command -v swaync >/dev/null 2>&1; then
-    pkill -x swaync 2>/dev/null || true
-    swaync >/dev/null 2>&1 &
-    command -v swaync-client >/dev/null 2>&1 && swaync-client --reload-config 2>/dev/null || true
+    # the unit's drop-in (~/.config/systemd/user/swaync.service.d/niri.conf) picks niri's config
+    systemctl --user restart swaync.service 2>/dev/null || true
 fi
 
 # Waybar is started by waybar-niri.sh (single owner of its launch command);

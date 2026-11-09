@@ -10,7 +10,7 @@ binds {
     Mod+H repeat=false hotkey-overlay-title="Key bindings overlay" { show-hotkey-overlay; }
     Mod+Shift+Slash repeat=false hotkey-overlay-title=null { show-hotkey-overlay; }
     Mod+Alt+R repeat=false hotkey-overlay-title="Refresh bar and menus" { spawn-sh "$HOME/.config/niri/scripts/refresh.sh"; }
-    // fcitx5 sometimes shows candidates but stops committing text; a restart fixes it.
+    // Manual fallback if fcitx5 shows candidates but commits nothing (see scripts/osk.sh).
     Mod+Ctrl+I repeat=false hotkey-overlay-title="Restart fcitx5" { spawn-sh "pkill -x fcitx5; sleep 0.3; exec fcitx5 -d"; }
     Mod+period repeat=false hotkey-overlay-title="Emoji menu" { spawn-sh "$HOME/.config/niri/scripts/rofi-emoji.sh"; }
     // Same command as Hyprland. niri advertises wlr-foreign-toplevel-management;

@@ -78,7 +78,9 @@ write_lock_colors() {
 run_wallust() {
     local img=$1
     if wallust --version 2>/dev/null | grep -qE '^wallust (2|3)\.'; then
-        wallust run -s "$img"
+        # niri's wallust.toml: the shared one minus the Hyprland template
+        wallust run -s -C "$NIRI_DIR/wallust/wallust.toml" \
+            --templates-dir "$HOME/.config/wallust/templates" "$img"
     else
         wallust run "$img"
     fi

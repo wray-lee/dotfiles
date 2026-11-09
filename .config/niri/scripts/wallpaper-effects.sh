@@ -79,7 +79,8 @@ apply_effect() {
 
 theme="$HOME/.config/rofi/config-wallpaper-effect.rasi"
 choice=$(printf '%s\n' "${effects[@]}" | LC_ALL=C sort |
-    rofi -dmenu -i -config "$theme") || exit 0
+    rofi -dmenu -i -config "$theme" \
+        -theme-str "inputbar { background-image: url(\"$current\", width); }") || exit 0
 [[ -n $choice ]] || exit 0
 
 applied=$current

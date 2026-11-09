@@ -20,7 +20,9 @@ spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/nightlight.sh
 
 // Notification daemon and status bar. scripts/waybar-niri.sh owns the bar's
 // config/style paths (the "Laptop" variant avoids its interactive picker).
-spawn-at-startup "swaync"
+// swaync runs as its systemd unit; ~/.config/systemd/user/swaync.service.d/niri.conf makes it load
+// niri's swaync/config.json (control-centre buttons call niri scripts).
+spawn-at-startup "systemctl" "--user" "start" "swaync.service"
 spawn-at-startup "sh" "-c" "exec bash \"$HOME/.config/niri/scripts/waybar-niri.sh\" Laptop"
 
 // Idle/lock handling (niri-tuned config, idle/hypridle.conf).

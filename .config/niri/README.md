@@ -4,8 +4,10 @@ A self-contained desktop for niri 26.04 (new touchscreen laptop), built to feel
 like the existing Hyprland session. Nothing outside `~/.config/niri/` is edited.
 The only additions elsewhere are new waybar files (`ModulesNiri`,
 `ModulesNiriOverrides`, `configs/[TOP] Niri Laptop`, `config-niri`); existing
-waybar files, `~/.config/hypr`, `~/.config/wlogout`, `~/.config/rofi`,
-`~/.config/swaync` and `~/.config/wallust` are read-only inputs.
+waybar files, `~/.config/wlogout`, `~/.config/rofi`, `~/.config/swaync` and
+`~/.config/wallust` are read-only inputs shared with Hyprland. niri keeps its
+own `swaync/config.json` (control-centre buttons call niri scripts) and
+`wallust/wallust.toml` (no Hyprland template), and never reads `~/.config/hypr`.
 
 ## How the pieces fit (design contract)
 
@@ -188,8 +190,16 @@ too). xwayland-satellite is started on demand by niri.
   panel differently, `niri msg outputs` will show it; update both
   `conf/outputs.kdl` and the `touch { map-to-output }` line. A wrong name is
   ignored (touch falls back to the union of outputs).
+- swaync is started through its systemd unit (it is D-Bus activated, so flags
+  on a plain `swaync` spawn are lost). The drop-in
+  `~/.config/systemd/user/swaync.service.d/niri.conf` loads `swaync/config.json`
+  from this directory when `XDG_CURRENT_DESKTOP=niri`; it ships with the
+  dotfiles, so copying `.config` installs it.
+- `install.sh` does the steps that live outside `~/.config` (the udev rule
+  below, which needs sudo) and reloads the user systemd manager.
 - On-screen keyboard: `scripts/osk.sh show|hide|toggle` drives squeekboard over
-  D-Bus (fcitx5 holds input-method-v2, so it never pops up on text focus). The
+  D-Bus. A running squeekboard takes input-method-v2 from fcitx5 and niri never
+  gives it back, so `hide` quits squeekboard and restarts fcitx5. The
   laptop has no tablet-mode switch, so `udev/90-osk-keyboard-cover.rules` shows
   it when the keyboard cover is detached and hides it when attached; the waybar
   `custom/osk` button toggles it by touch. The rule must be installed into
