@@ -8,8 +8,8 @@ binds {
 
     Mod+WheelScrollDown cooldown-ms=150 repeat=false hotkey-overlay-title="Workspace down" { focus-workspace-down; }
     Mod+WheelScrollUp cooldown-ms=150 repeat=false hotkey-overlay-title="Workspace up" { focus-workspace-up; }
-    Mod+Ctrl+WheelScrollDown cooldown-ms=150 repeat=false hotkey-overlay-title="Move column to workspace down" { move-column-to-workspace-down; }
-    Mod+Ctrl+WheelScrollUp cooldown-ms=150 repeat=false hotkey-overlay-title="Move column to workspace up" { move-column-to-workspace-up; }
+    Mod+Ctrl+WheelScrollDown cooldown-ms=150 repeat=false hotkey-overlay-title="Move window to workspace down" { move-window-to-workspace-down; }
+    Mod+Ctrl+WheelScrollUp cooldown-ms=150 repeat=false hotkey-overlay-title="Move window to workspace up" { move-window-to-workspace-up; }
     Mod+WheelScrollRight repeat=false hotkey-overlay-title="Focus column right" { focus-column-right; }
     Mod+WheelScrollLeft repeat=false hotkey-overlay-title="Focus column left" { focus-column-left; }
     Mod+Ctrl+WheelScrollRight repeat=false hotkey-overlay-title="Move column right" { move-column-right; }
