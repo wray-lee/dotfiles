@@ -150,8 +150,10 @@ alias kssh="kitty +kitten ssh"
 alias pip='uv pip '
 alias cc-switch="cc-switch-cli"
 ytmpv() {
-  local url
-  url=$(yt-dlp --no-download --get-url \
-    --cookies /home/wray/.config/microsoft-edge "$1") || return 1
-  mpv --hwdec=auto --profile=low-latency --untimed --vo=gpu-next "$url"
+  local info url ua
+  info=$(yt-dlp -f best --no-download --dump-single-json \
+    --cookies-from-browser firefox "$1") || return 1
+  url=$(jq -r '.url' <<<"$info")
+  ua=$(jq -r '.http_headers["User-Agent"] // empty' <<<"$info")
+  mpv --user-agent="$ua" --hwdec=auto --profile=low-latency --untimed --vo=gpu-next "$url"
 }
