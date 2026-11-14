@@ -1,0 +1,297 @@
+--[[
+    copypaste.lua by zydezu
+    (https://github.com/zydezu/mpvconfig/blob/main/scripts/copypaste.lua)
+
+    Copy and paste file paths, URLs and timestamps
+--]]
+
+mp.utils = require("mp.utils")
+
+local options = {
+    -- Keybinds
+    copy_keybind = [[
+        ["ctrl+c", "ctrl+C", "meta+c", "meta+C"]
+    ]],
+    paste_keybind = [[
+        ["ctrl+v", "ctrl+V", "meta+v", "meta+V"]
+    ]],
+    open_keybind = "o",
+    copy_youtube_timestamp = true,
+}
+
+(require "mp.options").read_options(options)
+
+-- Native clipboard via `clipboard/text`
+local native_clipboard = nil
+do
+    local ver = tonumber(((mp.get_property("mpv-version") or ""):match("v0%.(%d+)")))
+    native_clipboard = ver ~= nil and ver >= 41
+end
+if not native_clipboard then
+    mp.msg.warn("clipboard support requires mpv >= 0.41 - please update mpv")
+end
+-- File/URL pasting
+
+options.copy_keybind = mp.utils.parse_json(options.copy_keybind)
+options.paste_keybind = mp.utils.parse_json(options.paste_keybind)
+
+local device = "linux"
+if os.getenv("windir") ~= nil then
+    device = "windows"
+elseif os.execute '[ -d "/Applications" ]' == 0 and os.execute '[ -d "/Library" ]' == 0 or os.execute '[ -d "/Applications" ]' == true and os.execute '[ -d "/Library" ]' == true then
+    device = "mac"
+end
+
+local function file_exists(name)
+    local f = io.open(name, "r")
+    if f ~= nil then
+        io.close(f)
+        return true
+    else
+        return false
+    end
+end
+
+local function bind_keys(keys, name, func, opts)
+    if not keys then
+        mp.add_forced_key_binding(keys, name, func, opts)
+        return
+    end
+
+    for i = 1, #keys do
+        if i == 1 then
+            mp.add_forced_key_binding(keys[i], name, func, opts)
+        else
+            mp.add_forced_key_binding(keys[i], name .. i, func, opts)
+        end
+    end
+end
+
+local function set_clipboard(text)
+    local ok, res = pcall(mp.set_property, "clipboard/text", text)
+    if not ok then
+        mp.msg.error("failed to copy: " .. tostring(res))
+        mp.osd_message("Copy failed (requires mpv >= 0.41)", 3)
+    end
+end
+
+local function get_clipboard()
+    local ok, res = pcall(mp.get_property, "clipboard/text")
+    if ok and res ~= nil then
+        return res
+    end
+    mp.msg.error("failed to paste: " .. tostring(res or "clipboard unavailable"))
+    return ""
+end
+
+local function is_url(s)
+    local url_pattern = "^[%w]+://[%w%.%-_]+%.[%a]+[-%w%.%-%_/?&=]*"
+    return string.match(s, url_pattern) ~= nil
+end
+
+local ignore_next_playlist_increase = false
+
+local function start_last_added(index)
+    local idle = mp.get_property_bool("idle-active", false)
+    if not idle and not mp.get_property_bool("eof-reached", false) then
+        return
+    end
+    if mp.get_property_number("playlist-pos", -1) ~= index then
+        mp.set_property("playlist-pos", index)
+    end
+end
+
+local function add_item(name, file)
+    ignore_next_playlist_increase = true
+    mp.add_timeout(1, function() ignore_next_playlist_increase = false end)
+    if mp.get_property_number("playlist-count", 0) == 0 then
+        mp.commandv("loadfile", file)
+        return
+    end
+    -- Don't auto-play; only when the current video has ended
+    local index = mp.get_property_number("playlist-count", 0)
+    mp.commandv("loadfile", file, "append")
+    start_last_added(index)
+    mp.osd_message("Added " .. name .. " to playlist")
+end
+
+local function is_timestamp(str)
+    local pattern = "^%d+:%d+$" -- Matches "1:05", "0:54", "12:05"
+
+    if string.match(str, pattern) then
+        return true
+    else
+        pattern = "^%d+:%d+:%d+$" -- Matches "1:12:02", "119:14"
+        if string.match(str, pattern) then
+            return true
+        else
+            return false
+        end
+    end
+end
+
+local function convert_timestamp(timestamp)
+    local hours, minutes, seconds = 0, 0, 0
+
+    local parts = {}
+    for part in string.gmatch(timestamp, "%d+") do
+        table.insert(parts, tonumber(part))
+    end
+
+    if #parts == 2 then
+        minutes = parts[1]
+        seconds = parts[2]
+    elseif #parts == 3 then
+        hours = parts[1]
+        minutes = parts[2]
+        seconds = parts[3]
+    else
+        return nil -- Invalid format
+    end
+
+    local total_seconds = hours * 3600 + minutes * 60 + seconds
+    return total_seconds
+end
+
+local function copy()
+    local path = mp.get_property("path")
+    if path then path = path:gsub("^%s+", ""):gsub("%s+$", "") end
+
+    local function remove_timestamp_from_url(inputpath)
+        if type(inputpath) == "string" then
+            local new_path = inputpath:gsub("([&?])t=%d+", function(sep)
+                return sep == "?" and "?" or ""
+            end)
+            new_path = new_path:gsub("[?&]$", "")
+            if new_path ~= inputpath then
+                inputpath = new_path
+            end
+        end
+        return inputpath
+    end
+
+    local function add_timestamp_to_url(url, seconds)
+        if type(url) ~= "string" or type(seconds) ~= "number" then
+            return url
+        end
+        url = remove_timestamp_from_url(url)
+        local sep = url:find("?") and "&" or "?"
+        return url .. sep .. "t=" .. tostring(seconds)
+    end
+
+    if options.copy_youtube_timestamp and is_url(path) then
+        path = remove_timestamp_from_url(path)
+        local time_pos = mp.get_property_number("time-pos", 0)
+        if time_pos > 0 then
+            path = add_timestamp_to_url(path, math.floor(time_pos))
+        end
+    end
+
+    set_clipboard(path)
+    if is_url(path) then
+        mp.osd_message("Copied URL to clipboard")
+    else
+        mp.osd_message("Copied path to clipboard")
+    end
+end
+
+local function paste()
+    mp.osd_message("Loading...", 3)
+    local clip = get_clipboard()
+    if not clip then return end
+    clip = clip:gsub("\n", " ")
+    clip = clip:gsub("^%s+", ""):gsub("%s+$", "")
+    if not clip then return end
+    local clip_file = clip:gsub('"', "")
+    if is_url(clip) then
+        add_item("URL", clip)
+    elseif file_exists(clip_file) then
+        add_item("file", clip_file)
+    elseif is_timestamp(clip) then
+        local time = convert_timestamp(clip)
+        if time then
+            mp.commandv("seek", time, "absolute", "exact")
+        end
+    end
+end
+
+local function open()
+    local path = mp.get_property("path")
+    if not path then return end
+
+    local args
+    if is_url(path) then
+        if device == "windows" then
+            args = { "powershell", "start", path }
+        elseif device == "mac" then
+            args = { "open", path }
+        else -- linux
+            args = { "xdg-open", path }
+        end
+    else
+        if device == "windows" then
+            args = { "explorer", "/select,", path }
+        elseif device == "mac" then
+            args = { "open", "-a", "Finder", "-R", path }
+        else -- linux, for ubuntu
+            args = {
+                "dbus-send", "--print-reply",
+                "--dest=org.freedesktop.FileManager1",
+                "/org/freedesktop/FileManager1",
+                "org.freedesktop.FileManager1.ShowItems",
+                "array:string:file://" .. path,
+                "string:"
+            }
+        end
+    end
+
+    mp.command_native_async({ name = "subprocess", args = args })
+end
+
+-- Drag-and-dropped files/links
+local last_playlist_count = mp.get_property_number("playlist-count", 0)
+-- Events during the initial launch load (e.g. autocreate-playlist expanding
+-- a command line file) shouldn't count as drops. Consider every drop once
+-- the player started a file, or immediately when launched into idle.
+local bootstrapped = false
+
+mp.register_event("start-file", function()
+    bootstrapped = true
+    last_playlist_count = mp.get_property_number("playlist-count", 0)
+end)
+
+mp.observe_property("idle-active", "bool", function(_, idle_active)
+    if idle_active and not bootstrapped then
+        bootstrapped = true
+        last_playlist_count = mp.get_property_number("playlist-count", 0)
+    end
+end)
+
+mp.observe_property("playlist-count", "number", function(_, count)
+    if type(count) ~= "number" then return end
+    if not bootstrapped then
+        last_playlist_count = count
+        return
+    end
+
+    if ignore_next_playlist_increase then
+        ignore_next_playlist_increase = false
+        last_playlist_count = count
+        return
+    end
+
+    if count > last_playlist_count then
+        -- Items appended by drag-and-drop
+        local first_added = last_playlist_count -- 0-based index of first new entry
+        local playlist = mp.get_property_native("playlist")
+        if type(playlist) == "table" and #playlist > 0 then
+            start_last_added(first_added)
+        end
+    end
+
+    last_playlist_count = count
+end)
+
+bind_keys(options.copy_keybind, "copy", copy)
+bind_keys(options.paste_keybind, "paste", paste)
+mp.add_forced_key_binding(options.open_keybind, "open", open)

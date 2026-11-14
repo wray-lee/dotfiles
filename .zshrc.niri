@@ -138,4 +138,20 @@ alias offm='niri msg action power-off-monitors'
 wr() {
   t=1; for n in 1 2 3 4 5 6 7 8 9 10 scratch; do i=$(niri msg --json workspaces | jq -r --arg n "$n" '.[]|select(.name==$n)|.idx'); niri msg action move-workspace-to-index --reference "$i" "$t"; t=$((t+1)); done
 }
-alias xfce='startx /usr/bin/startxfce4 -- :1 vt2'
+alias nas='sudo mount -o username=wray //10.0.0.91/d /mnt/smb'
+alias df='duf'
+alias mpvs='mpv --hwdec=vaapi --profile=low-latency --untimed --force-seekable=yes '
+alias vpn='sudo systemctl start clash'
+alias ungitvpn='git config --global --unset http.proxy ; git config --global --unset https.proxy'
+alias gitvpn='git config --global http.proxy 'socks5://127.0.0.1:7999' ; git config --global https.proxy 'socks5://127.0.0.1:7999''
+alias n2n='edge -c starstudio -k starstudio -l 160.202.250.172:7778 -f -a 223.252.0.2'
+alias typora='typora --ozone-platform-hint=auto --enable-wayland-ime --wayland-text-input-version=3 '
+alias kssh="kitty +kitten ssh"
+alias pip='uv pip '
+alias cc-switch="cc-switch-cli"
+ytmpv() {
+  local url
+  url=$(yt-dlp --no-download --get-url \
+    --cookies /home/wray/.config/microsoft-edge "$1") || return 1
+  mpv --hwdec=auto --profile=low-latency --untimed --vo=gpu-next "$url"
+}
