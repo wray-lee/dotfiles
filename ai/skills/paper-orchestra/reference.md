@@ -1,122 +1,41 @@
 # PaperOrchestra reference
-
-Distilled from upstream commit d9bae99: `methods/prompts/*.py`,
-`methods/agents/content_refinement_agent.py` and `autoraters/agent_review.py`. The ML
-defaults have been removed. Wherever a rule says "per contract", the project's
-`orchestra/process.md` supplies the value.
-
-## Knowledge isolation (every writer and refiner)
-
-Write only from the raw materials, the citation_map and the figures. Do not recall or
-reconstruct a published version of this work. Do not infer author identities or
-affiliations. Anonymize only if the contract asks for it.
-
-## Outline (`outline.json`)
-
-```json
-{
-  "plotting_plan": [
-    {"figure_id": "fig_semantic_name", "title": "...", "plot_type": "plot|diagram",
-     "data_source": "idea.md|experimental_log.md|both",
-     "objective": "the claim this figure supports, and the chart type",
-     "aspect_ratio": "1:1|3:2|4:3|16:9|...", "serves": ["S2"]}
-  ],
-  "intro_related_work_plan": {
-    "introduction_strategy": {
-      "hook_hypothesis": "broad context",
-      "problem_gap_hypothesis": "gap scoped strictly to the data in experimental_log.md",
-      "search_directions": ["3-5 queries: why the gap matters, reviews, foundational papers"]
-    },
-    "related_work_strategy": {
-      "overview": "...",
-      "subsections": [
-        {"subsection_title": "...", "methodology_cluster": "an approach or line of evidence close to ours",
-         "sota_investigation_mission": "recent work before the cutoff, for context",
-         "limitation_hypothesis": "what this line leaves open, per idea.md",
-         "limitation_search_queries": ["narrow queries"],
-         "bridge_to_our_method": "how our result addresses it"}
-      ]
-    }
-  },
-  "section_plan": [
-    {"section_title": "...", "subsections": [
-      {"subsection_title": "...",
-       "content_bullets": ["specific, pointing at source files, e.g. 'state Eq. 3 from idea.md'"],
-       "citation_hints": ["Author (Exact Title)", "or: work introducing 'Exact Name'"],
-       "serves": ["S1", "S3"]}
-    ]}
-  ]
-}
-```
-
-Rules:
-- The Introduction cites broad context. The related-work clusters (2-4) cite close
-  neighbors. The two lists do not overlap.
-  - Sizes are per contract.
-  - If the contract has no Related Work section, the clusters still guide the
-    search and feed the Introduction and Discussion.
-- `serves` names storyline sentences from `storyline.md`. A subsection that serves none
-  is setup a later sentence depends on (say which) or goes to Methods or the supplement.
-  `serves` IDs, log row IDs and material IDs are internal: they stay in the outline,
-  trace and gate files and never appear in the paper's text.
-- No orphan subsections: if X.1 exists, X.2 must exist.
-- Every citation hint names exactly one canonical work. If the author is not known
-  for certain, use the "work introducing" form instead of guessing.
-- Claim superiority or difference only against what `experimental_log.md` actually
-  compares. Present other work as context. The comparison object is per contract.
-
+Rules reached when a step needs them. This file is the single source of truth for dispatch branches and the missing-score outcome. Project values come from `<paper>/orchestra/process.md`, the contract. This file is the only normative source for the rules the flow enforces.
+## Outline
+`outline.json` has `plotting_plan`, `intro_related_work_plan` and `section_plan`. Each figure entry has `figure_id`, `title`, `plot_type`, `data_source`, `aspect_ratio`, `objective` and `serves`; each subsection has `subsection_title`, `content_bullets`, `citation_hints` and `serves`. Extract `serves` into pipeline files only. Introduction cites context; related-work clusters cite neighbors, or feed Introduction and Discussion when there is no Related Work. Every sentence is served by a subsection and, where the venue uses figures, a figure. `plotting_plan` may be empty. With `venue.related_work` true and `venue.introduction` false, stage 2a writes the Related Work section alone. These are the only dispatch branches: `venue.related_work` true writes Related Work; an empty figure plan passes stage 2b; the storyline review runs at stage 3 and again at the final gate. Any NOT_RUN from any check, review or score stops the run with its own reason; it is never scored, repaired, scored by a fallback or restored automatically. Before any refinement candidate exists the current write or v0 state stays live. A notes-only start creates the scope, then dispatches an explicit `snap --now empty` baseline and confirms it holds zero files before the first protected edit; an empty file set is permitted only here. Author notes stay outside the draft scope and the exclusion names their source path. Stage 3 alone requires the stage 0-2 materials and the stage 2 products this draft needs; missing materials stop with `stage_0_materials_missing`. A stage-4-only run without a build stops at stage 4. Stage 2 requires `cutoff` only for a non-empty query plan; an empty plan writes an empty citation map and search log. Verify hints with the contract's index, using "work introducing" when uncertain. Claim difference only against the log.
+## Stage content checks
+Each check returns ACCEPT, REJECT or NOT_RUN; other than ACCEPT stops. Stage 0 opens the four materials files: numbered sentences (INFERRED marked, matching the contract's Storyline file and section when present), pending branches and log rows, including no-numbers. Stage 1: `outline.json` parses, serves every sentence, plans figures and carries `citation_hints` for every material item. Stage 2a: every hint resolves or is unresolved. Stage 2b: every plan entry is accepted or carries an open request; an empty plan passes. The first step writes a missing contract from the caller's rules and notes and may never write an existing one; after writing it, read its fields as for an existing contract, with args filling only gaps and returning only Venue fields present in the contract. A later hash change is `contract_changed`.
+## Draft scope
+One step writes `<run>/scope.json` as `{"include", "exclude", "owned", "orch"}` string lists; `orch` names the actual orchestra directory relative to the paper. `include` is the contract's Draft files knob, else `draft_files`, else `"."`. Every entry in every list is a literal path: a path containing *, ? or [ is a contract error. `exclude` holds declared outputs not covered by a source output, output directories not containing a source output, intermediates, the actual orchestra directory and every run directory under `refine/`; the store always adds the actual `orch` and the fixed snapshot root `<paper>/orchestra/snapshots`, so begin, snap and restore never see snapshot files; a source beneath an output directory or outside the draft scope is a contract error before any edit; an output directory that is the paper root or overlaps a declared include stops the contract with `output_dir_overlaps_draft`. `owned` (required) holds Ownership paths and is always excluded. Paths are relative to the paper and use forward slashes. The store lexically prunes excluded paths before checking reparse points, and still fails closed on a reparse point inside the actual draft or output tree. It compares paths against the paper's realpath, rejects an empty file set, an absent include at creation and validation without the explicit empty-baseline flag, a non-literal entry or an exclude or owned path that covers an include, independent of the process working directory. New draft files lie under an included directory. The scope is fixed for the run. The scope step returns a fixed empty-baseline flag that later prompts reuse on resume, and returns an empty-baseline receipt only when the scope has no draft file, including a default include holding only excluded author notes; the receipt names paths to be created. The normal branch returns the `digest --scope` JSON as its receipt. Declared files must exist at the first scope; a later snapshot records their deletion. The first stage-3 edit of a missing draft takes an explicit empty baseline with `snap --now empty`; notes are not draft files. `digest` accepts an empty baseline.
+## Draft store
+`draft_store.py` is in the skill directory and uses the `python` on PATH. Every command prints one compact UTF-8 JSON object and exits 0 only when `ok` is true. Return it verbatim in `store_output`; `ok=false` is an error and ends the step. Expected findings (an absent tag, `type_clash`, `draft_changed_since_tag`, `completed_record`, a stale output, a missing report) are `ok=true` with a `findings` array; read them and stop only where a step names them. All `draft_store.py` commands run in Bash, Git Bash on Windows; the template's apostrophe escaping is for that shell alone.
+    python '<skill_dir>/draft_store.py' begin   --paper '<paper>' --scope '<run>/scope.json' --tag '<tag>' [--now empty]
+    python '<skill_dir>/draft_store.py' snap    --paper '<paper>' --scope '<run>/scope.json' --tag '<tag>' [--now empty]
+    python '<skill_dir>/draft_store.py' verify  --paper '<paper>' --tag '<tag>'
+    python '<skill_dir>/draft_store.py' audit   --paper '<paper>' --tag '<tag>'
+    python '<skill_dir>/draft_store.py' restore --paper '<paper>' --tag '<tag>' [--expect '<digest>']
+    python '<skill_dir>/draft_store.py' restore-pending --paper '<paper>' --tag '<tag>'
+    python '<skill_dir>/draft_store.py' digest  --paper '<paper>' --scope '<run>/scope.json'
+    python '<skill_dir>/draft_store.py' inventory --paper '<paper>' --scope '<run>/scope.json'
+    python '<skill_dir>/draft_store.py' resolve-paths --paper '<paper>' --paths '<p1>' '<p2>'
+    python '<skill_dir>/draft_store.py' check-input --paper '<paper>' --orch '<orchestra>' --run '<run>' --build '<id>' --digest '<digest>'
+    python '<skill_dir>/draft_store.py' verify-build --paper '<paper>' --build-file '<record>' --scope '<scope>' --paths '<output>' --sources '<source>' --declared '<dir>' --intermediates '<intermediate>' --run '<run>'
+    python '<skill_dir>/draft_store.py' record-digest --build-file '<record>'
+    python '<skill_dir>/draft_store.py' check-report --paper '<paper>' --report '<report>' --kind '<check>' --tag '<tag>' --run '<run>' [--verdict '<v>' --count '<n>']
+`begin` snapshots an absent tag or compares the live digest with an existing tag and returns both digests when they differ; it never restores. Every draft-changing call (write, revise, format, repair) runs `begin` as its first command in the same agent call and stops on `draft_changed_since_tag`; an edit call that returns null or that finding clears `current_tag` and reports its start tag and both digests, taken from a `verify` call on the start tag when the dead call returned none, else marked unavailable with that call's failure reason. A crashed edit leaves the live draft changed; the user keeps those bytes as the new draft or runs `restore --tag <starting tag>` from a later call to return to the tag, which backs up the current bytes first. An explicit revert after a score drop or NOT_RUN passes `--expect <digest>` for the version being reverted; a different live digest stops with `draft_changed_since_tag`, both digests and no change, else it restores the previous tag. Restoring a tag validates the scope stored with that snapshot, never the live includes. Snapshots, digests, `verify` and `restore` cover files only. Restore replaces each regular file with one atomic rename and never unlinks it first; a live draft already equal to the tag restores as an idempotent `ok`; a multi-file restore writes a persistent record before the first replacement and removes it after the last. A completed pending restore takes the same live-scan backup first and names it in the `completed_record` finding; a failed restore stop carries the store errors, the pending record path, the target tag and `restore --tag <target>`. On a case-insensitive volume a case-only spelling of a file include is restored like a directory include. A later restore reads that record before `--expect` and the idempotent test: when live equals the target, it unlinks the record and returns ok; otherwise it completes the remaining replacements from the record's done list, unlinks the record and returns ok with a finding naming the completed record, so the documented `restore --tag <tag>` finishes it. The workflow clears current_tag on any restore that does not complete or a digest mismatch; such a stop names the record path, the target tag, both digests and the target with `restore --tag <target>`. Restore removes files the snapshot does not hold, comparing paths by the target volume's identity (normcase plus samefile where both exist) and treating a case-only rename as one target; it creates parent directories files need but never prunes other directories. A restore before the first protected edit backs up every surviving scope file, and an empty backup manifest is written only when the actual surviving set is empty. A failed stop with an unfinished restore names the pending record, target tag and deterministic next command. A file/directory type clash is an expected preflight finding, `ok=true` with `touched:false`, a `findings` entry `type_clash` and the `conflicts` list, before any change. A reparse point or symlink inside a declared output tree or the draft scope that is not excluded fails closed. The contract step and the JS accept a contract when at least one of `outputs`, `source_outputs` or `output_dirs` is declared. Contract paths are resolved by `draft_store.py resolve-paths` against the filesystem to the canonical identity the inventory uses, case-insensitively on Windows volumes and without lowercasing POSIX paths. `check-input --orch <orchestra> --run <run> --build <id> --digest <digest>` persists the input digest before each build; a recovery candidate is a committed snapshot whose digest equals that bound input, never a `.tmp-*` staging directory or an earlier pre tag; when none matches, the stop says no snapshot matches and names no restore target. Tags, reports and worklogs live under `<orchestra>/refine/<run>/`; snapshots live under `<paper>/orchestra/snapshots/<tag>/` for any contract orch. One invocation owns one run tag; `refine/<run>/` is history, and concurrent runs on the same paper are the user's to avoid.
+## Builds and checks
+Every build runs in the contract's shell from the paper directory. `digest --scope` runs immediately before and after the command; a difference is `build_changed_draft` and there is no replay. Written means a path whose presence, size, SHA-256 or mtime differs between the committed pre-build inventory and the post-build inventory. The workflow snapshots the live draft as `pre-build-<gate>` before the build and names that tag in the stop. The store commits the pre-build inventory atomically before the first build attempt with the build start time; a resumed build reuses it, and a missing inventory for a started build stops the run. Verification compares the pre- and post-build inventories over the union of paths (size, SHA-256 and mtime): every delivery member must be rewritten by this build (its bytes or mtime differ from the committed pre-build inventory; source outputs need only existence and a current digest); a record `files` entry must match the live mtime exactly; the record deliverable set must equal the computed delivery set; any added, changed or deleted path outside delivery, declared intermediates and owned paths, including a history record, is `unlisted_output`. `inventory --scope` runs immediately before and after too; a new path or a size, digest or mtime change at identical bytes is written, and `unlisted_output` is a written path outside the delivery set, declared intermediates and owned paths. The inventory covers every readable non-owned file, skipping only the fixed snapshot root, this run's records and owned paths: a build-written file inside the orchestra is inventoried and `unlisted_output` unless declared. `check-input` binds the build id to the input digest before the command; a mismatch stops with a restorable tag. A build never rewrites a Draft file; one that does stops with the pre-build tag. An in-place formatter is an editing step run by an agent inside the scope, followed by a normal build. A build that reports `build_changed_draft` or a nonzero returncode is a result and is never retried by a fallback agent. The build result in `<run>/build-<gate>.json` records `returncode`, `started`, `pre_digest`, `post_digest`, `digest` (post), a `files` list with `path`, `sha256` and `mtime`, the `written` paths, a `deliverables` list, `verified` declared outputs and `sources` source outputs that exist. `mtime` is the exact `st_mtime_ns` written as a string of decimal digits; `started`, when present, is integer epoch nanoseconds. The delivery set is the contract's declared outputs, declared source outputs and non-intermediate, non-owned files under its output directories; it is computed from the contract, not from the record's written list. Each member must exist, have a files entry with its live digest and exact mtime, and have an mtime not older than the newest draft file. A written path outside delivery, declared intermediates and owned paths is `unlisted_output`; a declared intermediate directory covers its files, and a file listed directly is skipped only at its own path; a declared output inside a declared intermediate range is `contract_output_intermediate_overlap`. Every source output needs existence and its recorded digest; no rewrite is required. A nonzero exit, a missing or stale deliverable, a record whose deliverable list omits a live member, a written path outside the delivery set, declared intermediates or owned paths (`unlisted_output`), or a record without `written` and `deliverables` is `build_failed`. Checks read every deliverable the record lists. Each check prompt that reads build outputs names its exact snapshot tag and build record as explicit arguments; there is no default. A missing deliverable is NOT_RUN. File extensions in reports are examples, never a fixed scan list. No check rebuilds. The final gate runs whenever a draft stage is the last stage: a stage-3-only run gates on the write build and tag, a stage-4 run on the format build and tag. Repair rounds each build and pass their own tag and record. A null result stops with `agent_died`; resume the same Workflow run only after a null result or agent death. After a real REJECT or failure, restore the named tag before a new invocation with a new run tag. A real REJECT, failed build, snapshot or restore stops the run. Any NOT_RUN stops with its reason before the reject normalizer, repair or scoring; no check, score or review is repaired or restored automatically. Agent death and NOT_RUN stop with their own reasons; evidence death or NOT_RUN in stages 0-2 stops with STOPPED, not FAIL. Every REJECT stop carries a reason and its first blocker. A null final check stops at once. A score with a REJECT, decision Reject or any blocker reverts exactly like a lower score; an incomplete score is a reject signal, not a NOT_RUN. One reject-signal rule covers every gate. The only automatic restore is that scored refinement revert; a NOT_RUN never triggers it. A digest-equal NO_CHANGE ends the loop. An unscored revision is reverted to the previous accepted tag with outcome REVERT and logged; only agent death stops the run for resume. Final repairs run for up to two rounds; if checks still fail, the result is FAIL with the tags and no automatic restore. Evidence audits the last snapshot of the round, including `final-r<i>` after a repair; `last_accepted_tag` advances only when every gate for that same state, evidence included, passes: the final gate's tag. The score loop keeps `revert_tag`. A failed write or format is reported as current, never as accepted; the status reports `current_tag` null with `restore_tag` when the live bytes match no snapshot. Tags: pre tags `pre-write`, `pre-v0`, `v<i>`, `pre-format`, `pre-repair-<i>`; post tags `write`, `v0`, `v<i>`, `format`, `accepted`, `final-r<i>`. Keep every tag. Snapshots are under `<paper>/orchestra/snapshots/<tag>/`; reports and worklogs are under `<orchestra>/refine/<run>/`.
+## Reports and evidence
+A check writes `<run>/check-<k>-<tag>.md` and returns that path in `report`. Line 1: `run <run> | check <k> | <tag>`; line 2: `Verdict: ACCEPT|REJECT|NOT_RUN`; line 3: `Blockers: <count>`. The blocker list sits between the literal lines `BLOCKERS BEGIN` and `BLOCKERS END`; use `none` inside the block for zero. Tables, THOUGHT and score JSON outside the block are free text. The report's verdict and count must equal the returned structure; `check-report` counts only the block, allows any count for REJECT and requires zero for ACCEPT. No report means NOT_RUN. Evidence never appears in the ordinary dispatch list and runs once, serially, after the other final checks. Stage 3 runs it only when stage 4 is not scheduled. A contract that lists evidence among its checks reuses this task and does not dispatch it twice. Its report is written first and checked with the rest. Reports are checked for their first three lines and the blocker block. Every tag has an `ok=true` snapshot receipt; its tag and digest must agree with the command output and with the tag named in the prompt. Evidence runs `audit` on every older tag and `verify` only on the tag of the current state. It also rehashes every deliverable and the deliverable set from the exact build record; any difference stops the run with `build_output_drift` and no earlier check result is reused. Any other failure blocks.
 ## Section writing
-
-- Keep sections that are already written. Change them only where consistency
-  requires it.
-- Tables carry exact log values.
-- Place tables and figures as the venue requires.
-- Use every planned figure. Use the exact filenames. Describe what each plot actually
-  shows.
-- Cite with exact citation_map keys. Use the abstract to write specific sentences
-  about each cited work.
-- Include equations only where the materials support them.
-- Dissect the evidence the contract names: what holds, what does not, and why.
-
-## Reviewer rubric (AgentReview)
-
-The reviewer has expertise in the paper's field. It is responsible and benign, and
-critical of technical flaws. It reads the build and returns:
-- a THOUGHT section, then JSON with Summary, Strengths, Weaknesses and Questions;
-- sub-scores: Originality, Quality, Clarity, Significance, Soundness, Presentation and
-  Contribution (each 1-4);
-- Overall (1-10), Confidence (1-5) and Decision (Accept or Reject).
-
-Overall anchors:
-- 10: top 2%; would fight for acceptance.
-- 8: top 10%; all claims supported.
-- 6: major claims supported; minor gaps.
-- 5: main claims insufficiently supported; leaning reject.
-- 3: marginal contribution.
-- 1: not thorough enough, or not relevant to the venue.
-
+Keep written sections; change them only for consistency. Tables carry exact log values. Use each planned figure's filename and describe it. Cite citation_map keys; equations need material support. Dissect the evidence the contract names. The contract's Argument sections name paragraphs whose first sentence carries the storyline claim; with no knob, body paragraphs in reading order do. A Word or HTML native bibliography needs no BibTeX. A source the build edits in place is a Draft files entry.
+## Reader label check
+Read every rendered document the build record lists as a deliverable, including extra print versions and reused files, and every extractable layer, in build order. One document: an earlier definition covers later outputs; standalone: each carries its own. View rendered pages or figures and read CSS generated content and bitmap text. If a reader-visible area cannot be covered, the check is NOT_RUN. Keep superscripts separate where possible; text covers placeholders, captions, footnotes, tables and figure text. Classify from reader-visible evidence, including render order and build-origin mapping when the build rewrites reader terms; candidate tokens stay reader-visible. A label is a code-like token (letters with digits, dotted numbers, symbol-joined codes) or any token a reader takes as a name. A code-like token counts wherever it appears, including directly after a word with no space; the letters before it do not mask it. One rule decides every label in this order:
+- Internal working codes always block: ticket, review, round and implementation identifiers are `internal` even when the text defines them.
+- Standard apparatus passes: figure, table, equation and section numbering, supplementary item numbers, citations, units, DOIs, statistical symbols, and field-standard identifiers needing no definition (software names and versions, hash names and digests, data types, public resource identifiers, standard nomenclature). The Reader-facing labels knob extends this list.
+- Internal-source precedence is separate: an internal working code always blocks even when defined. Only reader-facing terms take the remaining tests. Candidate tokens are extracted from a reader-visible layer. Classification reads the contract's known internal-code list and the build-origin mapping named in the build record or a build-origin file, and returns NOT_RUN when provenance affects a candidate and the mapping is missing; identical rendered bytes with different build origins may therefore differ. With no Reader-facing labels knob, a reader-facing term in the standard set passes when defined at or before first use; a knob replaces that default set with its list, and a term outside the effective set that is defined in text is an `unlisted_label` open item and still blocks. `before_definition`: in the effective set, first use before the definition. "Defines" means the text states the referent at or before first use: an appositive, a copular sentence, "full name (Label)", or an earlier figure key.
+- Counterexamples for the same marker `R17`: "R17 is the internal review ticket for this section." is a blocked internal working code; "R17 (the visual pathway) responded first." is an allowed reader-facing term when it is in the effective set and defined at first use.
+Report one entry per token: `{token, class, first_location, count, quote}` with at most 15 words in `quote`, and a class among `internal`, `unlisted_label`, `before_definition`. Put every hit in both `hits` and `blockers`.
+## Number trace check
+If a reader-visible area cannot be covered, the number trace check is NOT_RUN. Trace research numbers (results, statistics, sample sizes and model or method parameters) in every rendered document to a row in `experimental_log.md` or a source the log names. Page numbers, section and figure numbering, dates and citation numbers are layout or reference apparatus, not research numbers; other checks cover them. A paper with no research numbers passes when the log says so.
 ## Refinement accept/revert rule
-
-Compare the new review with the previous one. The sub-axes are the seven sub-scores;
-Overall and Confidence are not among them.
-- Overall up → accept and continue.
-- Overall down → revert to the previous version and stop.
-- Overall equal:
-  - if the sum of sub-axis gains is at least the sum of drops → accept and continue;
-  - otherwise → revert and stop.
-
-Log every round to the worklog: plan, scores before, scores after, deltas, outcome.
-
-The author's turn:
-- Turn each weakness into an edit.
-- Answer each question inside the paper, not in a response letter.
-- Keep the listed strengths.
-- Ignore requests for new experiments or data.
-- Check every number against `experimental_log.md`.
-- Follow the contract's limitation rule.
-
-## Formatting pass
-
-One pass after the loop, run on the rendered pages. Fix overflowing or misplaced
-floats, unreadable figures and broken references. Change only the layout, never the
-content.
+Score the seven sub-axes Originality, Quality, Clarity, Significance, Soundness, Presentation and Contribution from 1 to 4, Overall from 1 to 10 and Confidence from 1 to 5. A score of 1 is unusable or unsupported; 4 for a sub-axis is excellent and ready to use. Overall 1 is unusable, 10 is ready for the target venue; Confidence 1 is a guess, 5 is certain. A complete score with a REJECT, decision Reject or any blocker reverts. A missing score is a NOT_RUN and stops without scoring, reverting or a fallback scorer; an unusable score is NOT_RUN too. Overall up accepts and continues; down reverts and stops; equal accepts when sub-axis gains at least drops, else reverts. A revision with no change against its pre tag is NO_CHANGE and ends the loop. A failed or unscored revision stops. Each round logs plan, scores, deltas and outcome. The author turns weaknesses into edits, answers questions in the paper, keeps strengths, ignores new experiment or data requests, checks numbers against the log, and follows the limitation rule.
