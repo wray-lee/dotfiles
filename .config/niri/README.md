@@ -197,9 +197,11 @@ too). xwayland-satellite is started on demand by niri.
   dotfiles, so copying `.config` installs it.
 - `install.sh` does the steps that live outside `~/.config` (the udev rule
   below, which needs sudo) and reloads the user systemd manager.
-- On-screen keyboard: `scripts/osk.sh show|hide|toggle` drives squeekboard over
-  D-Bus. A running squeekboard takes input-method-v2 from fcitx5 and niri never
-  gives it back, so `hide` quits squeekboard and restarts fcitx5. The
+- On-screen keyboard: `scripts/osk.sh show|hide|toggle` drives wvkbd by
+  signals (`~/.local/bin/wvkbd-deskintl`, built from wvkbd 0.21 with
+  `make LAYOUT=deskintl`). wvkbd uses the virtual-keyboard protocol, so keys
+  reach fcitx5 like physical ones (Chinese, `keyboard-us-intl` dead keys). Never
+  pass `--auto`: it binds input-method-v2 and takes the seat from fcitx5. The
   laptop has no tablet-mode switch, so `udev/90-osk-keyboard-cover.rules` shows
   it when the keyboard cover is detached and hides it when attached; the waybar
   `custom/osk` button toggles it by touch. The rule must be installed into
