@@ -8,11 +8,13 @@
 // e.g. "waybar-extra" does not pick up the rule by accident.
 // ---------------------------------------------------------------------------
 
-// launcher
+// launcher. xray false: with only blur set niri defaults to xray, which blurs
+// the wallpaper instead of the windows underneath (same setting as window-rules.kdl).
 layer-rule {
     match namespace="^rofi$"
     background-effect {
         blur true
+        xray false
     }
 }
 
@@ -21,6 +23,7 @@ layer-rule {
     match namespace="^swaync-control-center$"
     background-effect {
         blur true
+        xray false
     }
 }
 
